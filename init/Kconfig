@@ -1220,6 +1220,17 @@ source "usr/Kconfig"
 
 endif
 
+choice
+	prompt "Choose GCC optimization level"
+	default CC_OPTIMIZE_FOR_SIZE
+	help
+	   This option toggles GCC optimization level
+
+config CC_OPTIMIZE_NORMAL
+	bool "Normal optimization"
+	help
+	  Enabling this option will pass "-O2" to gcc
+
 config CC_OPTIMIZE_FOR_SIZE
 	bool "Optimize for size"
 	help
@@ -1227,6 +1238,14 @@ config CC_OPTIMIZE_FOR_SIZE
 	  resulting in a smaller kernel.
 
 	  If unsure, say N.
+
+config CC_OPTIMIZE_FOR_FAST
+	bool "Optimize for performance"
+	help
+	  Enabling this option will pass "-Ofast" instead of "-O2" to gcc
+	  resulting in a larger kernel and better code performance.
+
+endchoice
 
 config SYSCTL
 	bool
