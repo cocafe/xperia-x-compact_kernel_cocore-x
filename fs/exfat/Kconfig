@@ -21,6 +21,20 @@ config EXFAT_VIRTUAL_XATTR_SELINUX_LABEL
 	help
 	  Set this to the default string for SELinux label.
 
+config EXFAT_DEFAULT_CODEPAGE
+	int "Default codepage for exFAT"
+	default 437
+	depends on EXFAT_FS
+	help
+	  This option should be set to the codepage of your exFAT filesystems.
+
+config EXFAT_DEFAULT_IOCHARSET
+	string "Default iocharset for exFAT"
+	default "utf8"
+	depends on EXFAT_FS
+	help
+	  Set this to the default input/output character set you'd like exFAT to use.
+
 config EXFAT_SUPPORT_STLOG
 	bool "Enable storage log"
 	default y
