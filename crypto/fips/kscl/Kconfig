@@ -1,0 +1,3 @@
+config CRYPTO_SOMC_FIPS_KSCL
+	tristate "Sony Mobile Communications FIPS AES-XTS/AES-CBC Driver"
+	help
