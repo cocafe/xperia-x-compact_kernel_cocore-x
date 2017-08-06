@@ -2348,7 +2348,7 @@ static int parse_options(char *options, int silent, int *debug,
 	opts->tz_utc = 0;
 	opts->errors = EXFAT_ERRORS_RO;
 #if EXFAT_CONFIG_DISCARD
-	opts->discard = 0;
+	opts->discard = EXFAT_CONFIG_DISCARD_DEFAULT;
 #endif
 	*debug = 0;
 
