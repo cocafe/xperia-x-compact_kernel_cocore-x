@@ -5799,7 +5799,7 @@ dhd_module_init(void)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 0)
 #if defined(CONFIG_DEFERRED_INITCALLS)
 deferred_module_init(dhd_module_init);
-#elif defined(USE_LATE_INITCALL_SYNC)
+#elif defined(USE_LATE_INITCALL_SYNC) && !defined(MODULE)
 late_initcall_sync(dhd_module_init);
 #else
 late_initcall(dhd_module_init);
