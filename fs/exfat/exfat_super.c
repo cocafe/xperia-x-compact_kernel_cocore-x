@@ -108,6 +108,8 @@
 
 #include "exfat_super.h"
 
+#define FAKE_TUXERA_EXFAT 	1
+
 static struct kmem_cache *exfat_inode_cachep;
 
 static int exfat_default_codepage = CONFIG_EXFAT_DEFAULT_CODEPAGE;
@@ -2299,6 +2301,9 @@ enum {
 #if EXFAT_CONFIG_DISCARD
 	Opt_discard,
 #endif
+#if FAKE_TUXERA_EXFAT
+	Opt_utf8,
+#endif
 };
 
 static const match_table_t exfat_tokens = {
@@ -2318,6 +2323,9 @@ static const match_table_t exfat_tokens = {
 	{Opt_err_ro, "errors=remount-ro"},
 #if EXFAT_CONFIG_DISCARD
 	{Opt_discard, "discard"},
+#endif
+#if FAKE_TUXERA_EXFAT
+	{Opt_utf8, "utf8"},
 #endif
 	{Opt_err, NULL}
 };
@@ -2346,6 +2354,8 @@ static int parse_options(char *options, int silent, int *debug,
 
 	if (!options)
 		goto out;
+
+	printk("[EXFAT] Mount option: %s\n", options);
 
 	while ((p = strsep(&options, ",")) != NULL) {
 		int token;
@@ -2415,6 +2425,10 @@ static int parse_options(char *options, int silent, int *debug,
 #if EXFAT_CONFIG_DISCARD
 		case Opt_discard:
 			opts->discard = 1;
+			break;
+#endif
+#if FAKE_TUXERA_EXFAT
+		case Opt_utf8:
 			break;
 #endif
 		default:
@@ -2671,7 +2685,11 @@ static void exfat_debug_kill_sb(struct super_block *sb)
 
 static struct file_system_type exfat_fs_type = {
 	.owner       = THIS_MODULE,
+#if FAKE_TUXERA_EXFAT
+	.name        = "texfat",
+#else
 	.name        = "exfat",
+#endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,37)
 	.get_sb      = exfat_get_sb,
 #else
