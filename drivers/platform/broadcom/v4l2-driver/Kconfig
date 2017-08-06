@@ -1,0 +1,4 @@
+source "drivers/platform/broadcom/v4l2-driver/line_discipline_driver/Kconfig"
+source "drivers/platform/broadcom/v4l2-driver/bt_protocol_driver/Kconfig"
+source "drivers/platform/broadcom/v4l2-driver/v4l2_fm_driver/Kconfig"
+source "drivers/platform/broadcom/v4l2-driver/v4l2_ant_driver/Kconfig"

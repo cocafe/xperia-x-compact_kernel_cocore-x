@@ -8,3 +8,5 @@ endif
 if ARCH_MSM
 source "drivers/platform/msm/Kconfig"
 endif
+
+source "drivers/platform/broadcom/v4l2-driver/Kconfig"
