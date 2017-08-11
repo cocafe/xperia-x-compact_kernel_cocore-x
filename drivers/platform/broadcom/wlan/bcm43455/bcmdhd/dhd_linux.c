@@ -460,18 +460,18 @@ extern void dhd_netdev_free(struct net_device *ndev);
 #endif /* WL_CFG80211 */
 
 /* Error bits */
-module_param(dhd_msg_level, int, 0);
+module_param(dhd_msg_level, int, 0644);
 
 #ifdef ARP_OFFLOAD_SUPPORT
 /* ARP offload enable */
 uint dhd_arp_enable = TRUE;
-module_param(dhd_arp_enable, uint, 0);
+module_param(dhd_arp_enable, uint, 0644);
 
 /* ARP offload agent mode : Enable ARP Host Auto-Reply and ARP Peer Auto-Reply */
 
 uint dhd_arp_mode = ARP_OL_AGENT | ARP_OL_PEER_AUTO_REPLY;
 
-module_param(dhd_arp_mode, uint, 0);
+module_param(dhd_arp_mode, uint, 0644);
 #endif /* ARP_OFFLOAD_SUPPORT */
 
 /* Disable Prop tx */
@@ -502,12 +502,12 @@ module_param(dhd_console_ms, uint, 0644);
 
 
 uint dhd_slpauto = TRUE;
-module_param(dhd_slpauto, uint, 0);
+module_param(dhd_slpauto, uint, 0644);
 
 #ifdef PKT_FILTER_SUPPORT
 /* Global Pkt filter enable control */
 uint dhd_pkt_filter_enable = TRUE;
-module_param(dhd_pkt_filter_enable, uint, 0);
+module_param(dhd_pkt_filter_enable, uint, 0644);
 #endif
 
 /* Pkt filter init setup */
@@ -516,22 +516,22 @@ module_param(dhd_pkt_filter_init, uint, 0);
 
 /* Pkt filter mode control */
 uint dhd_master_mode = TRUE;
-module_param(dhd_master_mode, uint, 0);
+module_param(dhd_master_mode, uint, 0644);
 
 int dhd_watchdog_prio = 0;
-module_param(dhd_watchdog_prio, int, 0);
+module_param(dhd_watchdog_prio, int, 0644);
 
 /* DPC thread priority */
 int dhd_dpc_prio = CUSTOM_DPC_PRIO_SETTING;
-module_param(dhd_dpc_prio, int, 0);
+module_param(dhd_dpc_prio, int, 0644);
 
 /* RX frame thread priority */
 int dhd_rxf_prio = CUSTOM_RXF_PRIO_SETTING;
-module_param(dhd_rxf_prio, int, 0);
+module_param(dhd_rxf_prio, int, 0644);
 
 #if !defined(BCMDHDUSB)
 extern int dhd_dongle_ramsize;
-module_param(dhd_dongle_ramsize, int, 0);
+module_param(dhd_dongle_ramsize, int, 0644);
 #endif /* BCMDHDUSB */
 
 /* Keep track of number of instances */
@@ -577,12 +577,12 @@ module_param(dhd_sdiod_drive_strength, uint, 0);
 /* Tx/Rx bounds */
 extern uint dhd_txbound;
 extern uint dhd_rxbound;
-module_param(dhd_txbound, uint, 0);
-module_param(dhd_rxbound, uint, 0);
+module_param(dhd_txbound, uint, 0644);
+module_param(dhd_rxbound, uint, 0644);
 
 /* Deferred transmits */
 extern uint dhd_deferred_tx;
-module_param(dhd_deferred_tx, uint, 0);
+module_param(dhd_deferred_tx, uint, 0644);
 
 #ifdef BCMDBGFS
 extern void dhd_dbg_init(dhd_pub_t *dhdp);
