@@ -48,8 +48,9 @@
 };
 
 &soc {
+	/* Fingerprints Sensor FPC1145 */
 	fpc1145: fpc1145@0 {
-		reg = <0>;
+		reg = /bits/ 64 <0>;
 		status = "ok";
 		compatible = "fpc,fpc1020", "fpc1145";
 		interrupt-parent = <&msm_gpio>;
