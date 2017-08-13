@@ -1242,6 +1242,12 @@ config CC_OPTIMIZE_FOR_FAST
 	  Enabling this option will pass "-Ofast" instead of "-O2" to gcc
 	  resulting in a larger kernel and better code performance.
 
+config CC_OPTIMIZE_FOR_DEBUG
+	bool "Optimize code for debugging"
+	help
+	  Enabling this option will pass "-Og" to gcc resulting in a larger
+	  kernel and better code debugging experience.
+
 endchoice
 
 config SYSCTL
