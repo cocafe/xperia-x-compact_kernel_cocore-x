@@ -587,6 +587,9 @@ endif
 ifdef CONFIG_CC_OPTIMIZE_FOR_FAST
 KBUILD_CFLAGS	+= -Ofast $(call cc-disable-warning,maybe-uninitialized,)
 endif
+ifdef CONFIG_CC_OPTIMIZE_FOR_DEBUG
+KBUILD_CFLAGS   += -Og $(call cc-disable-warning,maybe-uninitialized,)
+endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
