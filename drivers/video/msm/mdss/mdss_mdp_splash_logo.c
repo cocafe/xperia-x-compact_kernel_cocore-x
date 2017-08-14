@@ -19,6 +19,9 @@
 #include <linux/memblock.h>
 #include <linux/bootmem.h>
 #include <linux/iommu.h>
+#include <linux/unistd.h>
+#include <linux/vmalloc.h>
+#include <linux/syscalls.h>
 #include <linux/of_address.h>
 #include <linux/fb.h>
 #include <linux/mm.h>
@@ -26,8 +29,13 @@
 
 #include "mdss_fb.h"
 #include "mdss_mdp.h"
-#include "splash.h"
 #include "mdss_mdp_splash_logo.h"
+
+#define SPLASH_IMAGE_WIDTH 		(720)
+#define SPLASH_IMAGE_HEIGHT		(1280)
+#define SPLASH_IMAGE_BPP		(3)
+#define SPLASH_IMAGE_FORMAT		MDP_BGR_888
+#define SPLASH_IMAGE_PATH		"/res/logo.raw"
 
 #define INVALID_PIPE_INDEX 0xFFFF
 #define MAX_FRAME_DONE_COUNT_WAIT 2
@@ -443,12 +451,59 @@ end:
 	return ret;
 }
 
+static uint8_t *mdss_mdp_splash_image_load(const char *filename)
+{
+	uint8_t *data = NULL;
+	ssize_t fd;
+	size_t file_sz;
+
+	fd = sys_open(filename, O_RDONLY, 0);
+	if (fd < 0) {
+		pr_err("%s: failed to open logo %s\n", __func__, filename);
+		return NULL;
+	}
+
+	file_sz = sys_lseek(fd, (off_t)0, 2);
+	if (file_sz <= 0) {
+		pr_err("%s: unexpected logo file length\n", __func__);
+		goto err_fd_close;
+	}
+
+	sys_lseek(fd, (off_t)0, 0);
+
+	data = vmalloc(file_sz);
+	if (!data) {
+		pr_err("%s: failed to allocate memory for logo file\n", __func__);
+		goto err_fd_close;
+	}
+
+	if (sys_read(fd, (uint8_t *)data, file_sz) != file_sz) {
+		pr_err("%s: failed to load logo file\n", __func__);
+
+		vfree(data);
+		data = NULL;
+		goto err_fd_close;
+	}
+
+err_fd_close:
+	sys_close(fd);
+
+	return data;
+}
+
+static void mdss_mdp_splash_image_free(uint8_t *data)
+{
+	if (data)
+		vfree(data);
+}
+
 static int mdss_mdp_display_splash_image(struct msm_fb_data_type *mfd)
 {
 	int rc = 0;
 	struct fb_info *fbi;
 	uint32_t image_len = SPLASH_IMAGE_WIDTH * SPLASH_IMAGE_HEIGHT
 						* SPLASH_IMAGE_BPP;
+	uint8_t *logo_data;
 	struct mdss_rect src_rect, dest_rect;
 	struct msm_fb_splash_info *sinfo;
 
@@ -485,7 +540,15 @@ static int mdss_mdp_display_splash_image(struct msm_fb_data_type *mfd)
 		goto end;
 	}
 
-	memcpy(sinfo->splash_buffer, splash_bgr888_image, image_len);
+	logo_data = mdss_mdp_splash_image_load(SPLASH_IMAGE_PATH);
+	if (!logo_data) {
+		pr_err("splash logo data load failure\n");
+		goto end;
+	}
+
+	memcpy(sinfo->splash_buffer, logo_data, image_len);
+
+	mdss_mdp_splash_image_free(logo_data);
 
 	rc = mdss_mdp_splash_iommu_attach(mfd);
 	if (rc)
