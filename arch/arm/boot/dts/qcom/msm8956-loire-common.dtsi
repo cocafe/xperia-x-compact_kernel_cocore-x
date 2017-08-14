@@ -2582,9 +2582,11 @@
 	status = "disabled";
 };
 
+/*
 &mdss_fb0 {
 	/delete-property/ qcom,mdss-fb-splash-logo-enabled;
 };
+*/
 
 &pmx_mdss {
 	label = "mdss-pins";
