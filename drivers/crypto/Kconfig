@@ -362,6 +362,11 @@ config CRYPTO_DEV_QCEDEV
 	  To compile this driver as a module, choose M here: the
 	  module will be called qcedev.
 
+config CRYPTO_DEV_QDRBG
+	tristate "Qualcomm FIPS Random Number Generator"
+	default n
+	help
+
 config CRYPTO_DEV_OTA_CRYPTO
 	tristate "OTA Crypto module"
 	help
