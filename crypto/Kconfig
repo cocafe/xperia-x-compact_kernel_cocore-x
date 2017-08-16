@@ -1450,6 +1450,5 @@ config CRYPTO_USER_API_SKCIPHER
 
 source "drivers/crypto/Kconfig"
 source crypto/asymmetric_keys/Kconfig
-source crypto/fips/kscl/Kconfig
 
 endif	# if CRYPTO
