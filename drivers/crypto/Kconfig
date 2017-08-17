@@ -367,6 +367,12 @@ config CRYPTO_DEV_QDRBG
 	default n
 	help
 
+config CRYPTO_DEV_QCRYPTO_FIPS
+	tristate "Quclcomm FIPS Crypto Driver"
+	depends on FIPS_ENABLE
+	default n
+	help
+
 config CRYPTO_DEV_OTA_CRYPTO
 	tristate "OTA Crypto module"
 	help
