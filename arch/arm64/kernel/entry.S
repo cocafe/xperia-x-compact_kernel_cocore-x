@@ -35,7 +35,7 @@
  */
 	.macro ct_user_exit, syscall = 0
 #ifdef CONFIG_CONTEXT_TRACKING
-	bl	context_tracking_user_exit
+	bl	user_exit
 	.if \syscall == 1
 	/*
 	 * Save/restore needed during syscalls.  Restore syscall arguments from
@@ -51,7 +51,7 @@
 
 	.macro ct_user_enter
 #ifdef CONFIG_CONTEXT_TRACKING
-	bl	context_tracking_user_enter
+	bl	user_enter
 #endif
 	.endm
 
