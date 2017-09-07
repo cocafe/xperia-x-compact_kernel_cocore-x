@@ -158,6 +158,12 @@ static int ldo_vibrator_probe(struct platform_device *pdev)
 	data->gpio = alt_gpio;
 	data->dev = &pdev->dev;
 
+	pr_info("%s: GPIO: %d\n", __func__, data->gpio);
+
+	ret = gpio_request(data->gpio, "ldo_vibrator");
+	if (ret)
+		dev_err(data->dev, "%s: failed to label gpio pin\n", __func__);
+
 	mutex_init(&data->lock);
 	INIT_WORK(&data->work, ldo_vibrator_vib_work);
 
