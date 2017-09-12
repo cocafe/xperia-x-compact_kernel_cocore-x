@@ -137,11 +137,9 @@ static ssize_t show_nr_thermal_max_cpus(struct cpuquiet_attribute *cattr, char *
 static ssize_t store_nr_min_cpus(struct cpuquiet_attribute *cattr,
 					const char *buf, size_t count)
 {
-	ssize_t ret = 0;
 	unsigned int new_min_cpus;
 
-	ret = sscanf(buf, "%u", &new_min_cpus);
-	if (ret != 1)
+	if (sscanf(buf, "%u", &new_min_cpus) != 1)
 		return -EINVAL;
 
 	if (new_min_cpus < 1 || new_min_cpus > num_present_cpus()) {
@@ -165,17 +163,15 @@ static ssize_t store_nr_min_cpus(struct cpuquiet_attribute *cattr,
 
 	cpuquiet_queue_work();
 
-	return ret;
+	return count;
 }
 
 static ssize_t store_nr_max_cpus(struct cpuquiet_attribute *cattr,
 					const char *buf, size_t count, bool thermal)
 {
-	ssize_t ret = 0;
 	unsigned int new_max_cpus;
 
-	ret = sscanf(buf, "%u", &new_max_cpus);
-	if (ret != 1)
+	if (sscanf(buf, "%u", &new_max_cpus) != 1)
 		return -EINVAL;
 
 	if (new_max_cpus < 1 || new_max_cpus > num_present_cpus()) {
@@ -207,7 +203,7 @@ static ssize_t store_nr_max_cpus(struct cpuquiet_attribute *cattr,
 
 	cpuquiet_queue_work();
 
-	return ret;
+	return count;
 }
 
 static ssize_t store_nr_power_max_cpus(struct cpuquiet_attribute *cattr,
