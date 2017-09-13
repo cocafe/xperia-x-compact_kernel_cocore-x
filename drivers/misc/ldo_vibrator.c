@@ -26,11 +26,14 @@
 #include <linux/platform_device.h>
 #include <linux/pm.h>
 #include <linux/slab.h>
+#include <linux/kobject.h>
 
 enum ldo_vibrator_state {
 	LDO_VIBRATOR_OFF,
 	LDO_VIBRATOR_ON,
 };
+
+static uint32_t ldo_vibrator_enable = true;
 
 static void ldo_vibrator_vib_set(struct ldo_vibrator_data *data, int on)
 {
@@ -79,6 +82,9 @@ static void ldo_vibrator_vib_enable(struct timed_output_dev *dev, int value)
 	struct ldo_vibrator_data *data = container_of(dev,
 						      struct ldo_vibrator_data,
 						      timed_dev);
+
+	if (!ldo_vibrator_enable)
+		return;
 
 	mutex_lock(&data->lock);
 	hrtimer_cancel(&data->vib_timer);
@@ -139,6 +145,40 @@ error:
 	return -ENODEV;
 }
 
+static ssize_t vib_enable_show(struct kobject *kobj,
+                               struct kobj_attribute *attr,
+                               char *buf)
+{
+	return snprintf(buf, PAGE_SIZE, "%u\n", ldo_vibrator_enable);
+}
+
+static ssize_t vib_enable_store(struct kobject *kobj,
+                                struct kobj_attribute *attr,
+                                const char *buf, size_t count)
+{
+	uint32_t t;
+
+	if (sscanf(buf, "%d", &t) != 1)
+		return -EINVAL;
+
+	ldo_vibrator_enable = !!t;
+
+	return count;
+}
+static struct kobj_attribute vib_enable_interface =
+	__ATTR(enable, 0644, vib_enable_show, vib_enable_store);
+
+static struct attribute *ldo_vibrator_attrs[] = {
+	&vib_enable_interface.attr,
+	NULL,
+};
+
+static struct attribute_group ldo_vibrator_interface_group = {
+	.attrs = ldo_vibrator_attrs,
+};
+
+static struct kobject *ldo_vibrator_kobject;
+
 static int ldo_vibrator_probe(struct platform_device *pdev)
 {
 	struct ldo_vibrator_data *data;
@@ -183,6 +223,19 @@ static int ldo_vibrator_probe(struct platform_device *pdev)
 
 	dev_set_drvdata(data->dev, data);
 
+	ldo_vibrator_kobject =
+		kobject_create_and_add("ldo_vibrator", kernel_kobj);
+	if (!ldo_vibrator_kobject) {
+		dev_err(data->dev, "%s: kobject creation failure\n", __func__);
+		return -EIO;
+	}
+
+	ret = sysfs_create_group(ldo_vibrator_kobject,
+	                         &ldo_vibrator_interface_group);
+	if (ret) {
+		kobject_put(ldo_vibrator_kobject);
+	}
+
 	dev_info(data->dev, "%s: success\n", __func__);
 out:
 	return ret;
@@ -197,6 +250,7 @@ static int ldo_vibrator_remove(struct platform_device *pdev)
 	ldo_vibrator_vib_set(data, 0);
 	timed_output_dev_unregister(&data->timed_dev);
 	mutex_destroy(&data->lock);
+	kobject_put(ldo_vibrator_kobject);
 
 	return 0;
 }
