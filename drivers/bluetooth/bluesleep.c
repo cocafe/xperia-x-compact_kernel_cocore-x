@@ -655,7 +655,9 @@ static int bluesleep_probe(struct platform_device *pdev)
 		goto free_bt_ext_wake;
 	}
 
-	enable_wakeup_irq(0);
+	/* IRQ is wakeup disabled by default */
+	atomic_inc(&bsi->wakeup_irq_disabled);
+
 	return 0;
 
 free_bt_ext_wake:
