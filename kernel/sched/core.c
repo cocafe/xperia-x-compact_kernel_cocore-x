@@ -952,6 +952,7 @@ static void set_load_weight(struct task_struct *p)
 	load->inv_weight = prio_to_wmult[prio];
 }
 
+#ifdef CONFIG_SCHED_HMP
 static void check_and_fix_crv(struct rq *rq)
 {
 	if (!rq->nr_running) {
@@ -964,6 +965,7 @@ static void check_and_fix_crv(struct rq *rq)
 			stats->cumulative_runnable_avg = 0;
 	}
 }
+#endif
 
 static void enqueue_task(struct rq *rq, struct task_struct *p, int flags)
 {
@@ -978,7 +980,11 @@ static void dequeue_task(struct rq *rq, struct task_struct *p, int flags)
 	update_rq_clock(rq);
 	sched_info_dequeued(p);
 	p->sched_class->dequeue_task(rq, p, flags);
+
+	#ifdef CONFIG_SCHED_HMP
 	check_and_fix_crv(rq);
+	#endif
+
 	trace_sched_enq_deq_task(p, 0, cpumask_bits(&p->cpus_allowed)[0]);
 }
 
