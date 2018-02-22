@@ -1,0 +1,2 @@
+obj-m := brcm_bt_drv.o
+ccflags-y += -w -DVERSION="\"1.2\""

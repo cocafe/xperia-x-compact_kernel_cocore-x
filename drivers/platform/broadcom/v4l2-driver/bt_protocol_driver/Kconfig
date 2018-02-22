@@ -1,0 +1,6 @@
+config BROADCOM_V4L2_BT_DRV
+	tristate "broadcom v4l2 BT protocol driver"
+	select BROADCOM_V4L2_HCI_LDISC
+	default m
+	help
+	  Enable broadcom v4l2 BT protocol driver supports
