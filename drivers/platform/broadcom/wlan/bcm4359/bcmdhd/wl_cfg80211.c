@@ -4918,7 +4918,7 @@ wl_cfg80211_disconnect(struct wiphy *wiphy, struct net_device *dev,
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0))
 	/* cfg80211 expects disconnect event from DHD to release wdev->current_bss */
-	cfg80211_disconnected(dev, reason_code, NULL, 0, false, GFP_KERNEL);
+	cfg80211_disconnected(dev, reason_code, NULL, 0, GFP_KERNEL);
 #endif /* (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) */
 
 	return err;
@@ -5626,7 +5626,7 @@ get_station_err:
 			/* Disconnect due to zero BSSID or error to get RSSI */
 			WL_ERR(("force cfg80211_disconnected: %d\n", err));
 			wl_clr_drv_status(cfg, CONNECTED, dev);
-			cfg80211_disconnected(dev, 0, NULL, 0, false, GFP_KERNEL);
+			cfg80211_disconnected(dev, 0, NULL, 0, GFP_KERNEL);
 			wl_link_down(cfg);
 		}
 	}
@@ -9977,7 +9977,7 @@ wl_notify_connect_status(struct bcm_cfg80211 *cfg, bcm_struct_cfgdev *cfgdev,
 						WL_ERR(("WLC_DISASSOC error %d\n", err));
 						err = 0;
 					}
-					cfg80211_disconnected(ndev, reason, NULL, 0, false, GFP_KERNEL);
+					cfg80211_disconnected(ndev, reason, NULL, 0, GFP_KERNEL);
 					wl_link_down(cfg);
 					wl_init_prof(cfg, ndev);
 				}
@@ -10317,7 +10317,7 @@ wl_check_pmstatus(struct bcm_cfg80211 *cfg, bcm_struct_cfgdev *cfgdev,
 			return err;
 		}
 
-		cfg80211_disconnected(ndev, reason, NULL, 0, false, GFP_KERNEL);
+		cfg80211_disconnected(ndev, reason, NULL, 0, GFP_KERNEL);
 		wl_link_down(cfg);
 	}
 
@@ -10772,7 +10772,7 @@ wl_notify_pfn_status(struct bcm_cfg80211 *cfg, bcm_struct_cfgdev *cfgdev,
 #ifndef WL_SCHED_SCAN
 	mutex_lock(&cfg->usr_sync);
 	/* TODO: Use cfg80211_sched_scan_results(wiphy); */
-	cfg80211_disconnected(ndev, 0, NULL, 0, false, GFP_KERNEL);
+	cfg80211_disconnected(ndev, 0, NULL, 0, GFP_KERNEL);
 	mutex_unlock(&cfg->usr_sync);
 #else
 	/* If cfg80211 scheduled scan is supported, report the pno results via sched
@@ -13813,7 +13813,7 @@ _Pragma("GCC diagnostic ignored \"-Wcast-qual\"")
 			continue;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0))
 		if (wl_get_drv_status(cfg, CONNECTED, iter->ndev)) {
-			cfg80211_disconnected(iter->ndev, 0, NULL, 0, false, GFP_KERNEL);
+			cfg80211_disconnected(iter->ndev, 0, NULL, 0, GFP_KERNEL);
 		}
 #endif /* (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 14, 0)) */
 		wl_clr_drv_status(cfg, READY, iter->ndev);
@@ -13979,7 +13979,7 @@ int wl_cfg80211_hang(struct net_device *dev, u16 reason)
 	} else
 #endif /* SOFTAP_SEND_HANGEVT */
 	{
-		cfg80211_disconnected(dev, reason, NULL, 0, false, GFP_KERNEL);
+		cfg80211_disconnected(dev, reason, NULL, 0, GFP_KERNEL);
 	}
 	if (cfg != NULL) {
 		wl_link_down(cfg);
@@ -14022,7 +14022,7 @@ int wl_cfg80211_cleanup(void)
 
 	if (wl_get_drv_status(cfg, CONNECTED, ndev) ||
 		wl_get_drv_status(cfg, CONNECTING, ndev)) {
-		cfg80211_disconnected(ndev, 0, NULL, 0, false, GFP_KERNEL);
+		cfg80211_disconnected(ndev, 0, NULL, 0, GFP_KERNEL);
 	}
 
 	/* clear all flags */

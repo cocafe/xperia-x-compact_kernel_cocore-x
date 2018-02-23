@@ -4,7 +4,7 @@ config BCMDHD
 	---help---
 	  This module adds support for wireless adapters based on
 	  Broadcom chipset.
-	  
+
 config BCMDHD_SDIO
 	bool "SDIO bus interface support"
 	depends on BCMDHD && MMC && !BCMDHD_PCIE
@@ -36,7 +36,7 @@ config BCM4356
 
 config BCM4359
 	bool "Broadcom 4359 wireless cards support"
-	depends on BCMDHD && BCMDHD_PCIE
+	depends on BCMDHD && (BCMDHD_SDIO || BCMDHD_PCIE)
 	---help---
 	  This module adds support for wireless adapters based on
 	  Broadcom 4359 chipset.
@@ -44,14 +44,14 @@ config BCM4359
 config BCMDHD_FW_PATH
 	depends on BCMDHD
 	string "Firmware path"
-	default "/system/etc/firmware/fw_bcmdhd.bin"
+	default "/system/etc/firmware/wlan/bcmdhd/fw_bcmdhd.bin"
 	---help---
 	  Path to the firmware file.
 
 config BCMDHD_NVRAM_PATH
 	depends on BCMDHD
 	string "NVRAM path"
-	default "/system/etc/wifi/bcmdhd.cal"
+	default "/system/etc/firmware/wlan/bcmdhd/bcmdhd.cal"
 	---help---
 	  Path to the calibration file.
 

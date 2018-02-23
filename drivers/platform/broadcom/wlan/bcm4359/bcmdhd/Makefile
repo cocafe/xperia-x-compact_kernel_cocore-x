@@ -27,11 +27,12 @@
 # Basic feature
 #####################
 
-DHDCFLAGS += -Wall -Wno-date-time -Wstrict-prototypes -Dlinux -DLINUX -DBCMDRIVER      \
-        -DBCMDONGLEHOST -DUNRELEASEDCHIP -DBCMDMA32 -DBCMFILEIMAGE      \
-        -DDHDTHREAD -DDHD_BCMEVENTS -DSHOW_EVENTS -DBCMDBG -DWLP2P      \
-        -DWIFI_ACT_FRAME -DARP_OFFLOAD_SUPPORT -DKEEP_ALIVE -DCSCAN     \
-        -DPKT_FILTER_SUPPORT -DEMBEDDED_PLATFORM -DPNO_SUPPORT
+DHDCFLAGS += -Wall -Wno-date-time -Wstrict-prototypes -Dlinux -DLINUX -DBCMDRIVER      	\
+        -DBCMDONGLEHOST -DUNRELEASEDCHIP -DBCMDMA32 -DBCMFILEIMAGE      		\
+        -DDHDTHREAD -DDHD_BCMEVENTS -DSHOW_EVENTS -DBCMDBG -DWLP2P      		\
+        -DWIFI_ACT_FRAME -DARP_OFFLOAD_SUPPORT -DKEEP_ALIVE -DCSCAN     		\
+        -DPKT_FILTER_SUPPORT -DEMBEDDED_PLATFORM -DPNO_SUPPORT				\
+        -DCONFIG_DTS
 
 #####################
 # Bus Interface Type
@@ -137,6 +138,8 @@ DHDCFLAGS += -DWL_SUPPORT_AUTO_CHANNEL -DSUPPORT_HIDDEN_AP
 DHDCFLAGS += -DDISABLE_11H_SOFTAP
 DHDCFLAGS += -DSUPPORT_HOSTAPD_BGN_MODE
 DHDCFLAGS += -DDISABLE_WL_FRAMEBURST_SOFTAP
+# For setting custom short & long retry limit
+DHDCFLAGS += -DSET_RETRY_LIMIT -DCUSTOM_SRL_SETTING=13 -DCUSTOM_LRL_SETTING=13
 
 # HW5 specific features
 DHDCFLAGS += -DSUPPORT_PM2_ONLY
@@ -206,6 +209,8 @@ DHDCFLAGS += -DCONFIG_HAS_WAKELOCK
 # Used short dwell time during initial scan
 DHDCFLAGS += -DUSE_INITIAL_SHORT_DWELL_TIME
 
+# Disable to delay link down event
+DHDCFLAGS += -DDISABLE_BCNLOSS_ROAM
 ##############################
 # Android Platform Definition
 ##############################
@@ -218,6 +223,8 @@ DHDCFLAGS += -DWL_ENABLE_P2P_IF
 # Default definitions for KitKat
 DHDCFLAGS += -DWL_CFG80211_STA_EVENT
 DHDCFLAGS += -DWL_IFACE_COMB_NUM_CHANNELS
+
+DHDCFLAGS += -DENABLE_INSMOD_NO_FW_LOAD
 
 ifneq ($(CONFIG_DHD_USE_SCHED_SCAN),)
 DHDCFLAGS += -DWL_SCHED_SCAN
@@ -256,6 +263,8 @@ DRIVER_TYPE ?= m
 
 # Chipsets supported both SDIO and PCIE
 ifneq ($(CONFIG_BCM4359),)
+  DHDCFLAGS += -DSOMC_MIMO
+  DHDCFLAGS += -DSOMC_BMIC
   DHDCFLAGS += -DBCM4359_CHIP -DSUPPORT_MULTIPLE_REVISION
   DHDCFLAGS += -DMIMO_ANT_SETTING
   DHDCFLAGS += -DDISABLE_PARALLEL_SCAN
@@ -281,10 +290,32 @@ ifeq ($(BUS_IFACE_PCIE),y)
   DHDCFLAGS += -DDHDTCPACK_SUPPRESS
 endif
 
+# tput enhancement for SDIO
+ifeq ($(BUS_IFACE_SDIO),y)
+  DHDCFLAGS += -DHW_OOB
+  DHDCFLAGS += -DCUSTOM_GLOM_SETTING=8 -DCUSTOM_RXCHAIN=1
+  DHDCFLAGS += -DUSE_DYNAMIC_F2_BLKSIZE -DDYNAMIC_F2_BLKSIZE_FOR_NONLEGACY=128
+  DHDCFLAGS += -DBCMSDIOH_TXGLOM -DCUSTOM_TXGLOM=1 -DBCMSDIOH_TXGLOM_HIGHSPEED
+  DHDCFLAGS += -DRXFRAME_THREAD
+  DHDCFLAGS += -DCUSTOM_AMPDU_BA_WSIZE=64 -DCUSTOM_IBSS_AMPDU_BA_WSIZE=16
+  DHDCFLAGS += -DCUSTOM_DPC_CPUCORE=0
+  DHDCFLAGS += -DCUSTOM_DEF_TXGLOM_SIZE=40 -DDHD_TXBOUND=40
+  DHDCFLAGS += -DENABLE_ADAPTIVE_SCHED -DCUSTOM_CPUFREQ_THRESH=1000000
+  DHDCFLAGS += -DCUSTOM_MAX_TXGLOM_SIZE=40
+  DHDCFLAGS += -DMAX_HDR_READ=128
+  DHDCFLAGS += -DDHD_FIRSTREAD=128
+  DHDCFLAGS += -DCUSTOM_AMPDU_MPDU=16
+  DHDCFLAGS += -DDHDTCPACK_SUPPRESS
+endif
+
 # For Runtime PM feature
 ifeq ($(BUS_IFACE_PCIE),y)
   DHDCFLAGS += -DBCMPCIE_OOB_HOST_WAKE
-  DHDCFLAGS += -DDHD_PCIE_RUNTIMEPM -DMAX_IDLE_COUNT=11 -DCUSTOM_DHD_RUNTIME_MS=100
+  DHDCFLAGS += -DDHD_PCIE_RUNTIMEPM -DMAX_IDLE_COUNT=11 -DCUSTOM_DHD_RUNTIME_MS=200
+endif
+
+ifeq ($(BUS_IFACE_SDIO),y)
+  DHDCFLAGS += -DCUSTOM_PSPRETEND_THR=30
 endif
 
 ifeq ($(CONFIG_ARCH_MSM),y)
@@ -306,7 +337,7 @@ endif
   DHDCFLAGS += -DSUPPORT_WL_TXPOWER
   DHDCFLAGS += -DWL11ULB
   DHDCFLAGS += -DDISABLE_TXBFR
-# DHDCFLAGS += -DWL_ABORT_SCAN
+  DHDCFLAGS += -DWL_ABORT_SCAN
 
  # Support CUSTOM_EVENT_PM_WAKE
   DHDCFLAGS += -DCUSTOM_EVENT_PM_WAKE=30
@@ -316,7 +347,7 @@ endif
   DHDCFLAGS :=$(filter-out -DDISABLE_11H_SOFTAP,$(DHDCFLAGS))
 ifeq ($(CONFIG_BCM4359),y)
   DHDCFLAGS += -DENABLE_INSMOD_NO_FW_LOAD
-  DHDCFLAGS += -DUSE_LATE_INITCALL_SYNC
+#  DHDCFLAGS += -DUSE_LATE_INITCALL_SYNC
 endif
 ifeq ($(CONFIG_ARCH_MSM8996),y)
  # Enable Dongle Isolation
@@ -508,15 +539,46 @@ endif
 #############################
 # Platform dependent feature
 #############################
+# Default Beacon timeout
+ifneq ($(CONFIG_SOMC_WLAN_BCN_TIMEOUT),)
+  DHDCFLAGS += -DCUSTOM_BCN_TIMEOUT=$(CONFIG_SOMC_WLAN_BCN_TIMEOUT)
+else
+  DHDCFLAGS += -DCUSTOM_BCN_TIMEOUT=3
+endif
+
+# The number of the maximum devices which phone can associate
+DHDCFLAGS += -DSOMC_MAX_ASSOC_NUM=10
+
+# Default Listen Interval in Beacons
+ifneq ($(CONFIG_SOMC_WLAN_LISTEN_INTERVAL),)
+  DHDCFLAGS += -DCUSTOM_LISTEN_INTERVAL=$(CONFIG_SOMC_WLAN_LISTEN_INTERVAL)
+endif
+
+# WAPI
+DHDCFLAGS += -DBCMWAPI_WPI -DBCMWAPI_WAI
+
+# Set keep alive period
+ifneq ($(CONFIG_SOMC_WLAN_KEEP_ALIVE_SETTING),)
+  DHDCFLAGS += -DCUSTOM_KEEP_ALIVE_SETTING=$(CONFIG_SOMC_WLAN_KEEP_ALIVE_SETTING)
+endif
+
+# Change scan time
+  DHDCFLAGS += -DCHANGE_SCAN_TIME
+
+# Enable Disconnection timing log
+  DHDCFLAGS += -DDHD_ENABLE_DISC_TIME_LOG
+
 #########
 # Others
 #########
+# Read custom mac address function
+  DHDCFLAGS += -DGET_CUSTOM_MAC_ENABLE
 
 
 EXTRA_LDFLAGS += --strip-debug
 EXTRA_CFLAGS += $(DHDCFLAGS) -DDHD_DEBUG
 EXTRA_CFLAGS += -DSRCBASE=\"$(src)\"
-EXTRA_CFLAGS += -I$(src)/include/ -I$(src)/
+EXTRA_CFLAGS += -I$(src)/include/ -I$(src)/ -I$(src)/../../common/
 KBUILD_CFLAGS += -I$(LINUXDIR)/include -I$(shell pwd)
 
 DHDOFILES := dhd_pno.o dhd_common.o dhd_ip.o dhd_custom_gpio.o \
@@ -524,7 +586,8 @@ DHDOFILES := dhd_pno.o dhd_common.o dhd_ip.o dhd_custom_gpio.o \
 	bcmutils.o bcmwifi_channels.o hndpmu.o linux_osl.o sbutils.o siutils.o \
 	wl_android.o wl_cfg80211.o wl_cfgp2p.o wl_cfg_btcoex.o wldev_common.o \
 	wl_linux_mon.o wl_roam.o dhd_linux_platdev.o dhd_linux_wq.o wl_cfg_btcoex.o \
-	dhd_wlfc.o hnd_pktq.o hnd_pktpool.o dhd_debug.o dhd_debug_linux.o
+	dhd_wlfc.o hnd_pktq.o hnd_pktpool.o dhd_debug.o dhd_debug_linux.o \
+	../../common/dhd_somc_custom.o
 
 
 ifeq ($(BUS_IFACE_SDIO),y)
@@ -544,8 +607,11 @@ DHDOFILES += $(ANDROID_OFILES)
 ifeq ($(CONFIG_WL_NAN),y)
 DHDOFILES += wl_cfgnan.o bcmxtlv.o
 endif
-bcmdhd-objs := $(DHDOFILES)
-obj-$(DRIVER_TYPE)   += bcmdhd.o
+
+MODNAME := wlan
+
+obj-$(CONFIG_BCMDHD)   += $(MODNAME).o
+$(MODNAME)-y := $(DHDOFILES)
 
 all:
 	@echo "$(MAKE) --no-print-directory -C $(KDIR) SUBDIRS=$(CURDIR) modules"
