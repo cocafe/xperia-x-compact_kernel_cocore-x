@@ -659,7 +659,7 @@ config MSM_CORE_CTL
 
 config MSM_CORE_CTL_HELPER
 	bool "Core control helper functions for dynamically hotplug CPUs"
-	select MSM_CORE_CTL
+	depends on MSM_CORE_CTL
 	help
 	  Provide helper functions for core control driver.
 
