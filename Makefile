@@ -340,10 +340,16 @@ DEPMOD		= /sbin/depmod
 PERL		= perl
 CHECK		= sparse
 
+ifneq (`which ccache`,)
+	CCACHE	= ccache
+else
+	CCACHE	=
+endif
+
 # Use the wrapper for the compiler.  This wrapper scans for new
 # warnings and causes the build to stop upon encountering them.
 #CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
-CC		= $(REAL_CC)
+CC		= $(CCACHE) $(REAL_CC)
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
