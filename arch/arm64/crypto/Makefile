@@ -39,4 +39,4 @@ $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
 
 obj-$(CONFIG_CRYPTO_CRC32_ARM64) += crc32-arm64.o
 
-CFLAGS_crc32-arm64.o	:= -mcpu=generic+crc
+# CFLAGS_crc32-arm64.o	:= -mcpu=generic+crc
