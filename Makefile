@@ -388,6 +388,8 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks \
 		   -std=gnu89
 
+KBUILD_CFLAGS	+= -march=armv8.1-a+fp+simd -mtune=cortex-a72.cortex-a53
+
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS   := -D__ASSEMBLY__
