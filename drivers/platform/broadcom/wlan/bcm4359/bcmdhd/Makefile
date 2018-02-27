@@ -582,6 +582,9 @@ EXTRA_LDFLAGS += --strip-debug
 EXTRA_CFLAGS += $(DHDCFLAGS) -DDHD_DEBUG
 EXTRA_CFLAGS += -DSRCBASE=\"$(src)\"
 EXTRA_CFLAGS += -I$(src)/include/ -I$(src)/ -I$(src)/../../common/
+ifeq ($(CONFIG_ARCH_MSM),y)
+EXTRA_CFLAGS += -Iarch/arm/mach-msm/include
+endif
 KBUILD_CFLAGS += -I$(LINUXDIR)/include -I$(shell pwd)
 
 DHDOFILES := dhd_pno.o dhd_common.o dhd_ip.o dhd_custom_gpio.o \
