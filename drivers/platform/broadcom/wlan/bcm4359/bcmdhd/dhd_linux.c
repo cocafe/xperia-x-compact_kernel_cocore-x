@@ -680,18 +680,18 @@ static void dhd_update_rx_pkt_chainable_state(dhd_pub_t* dhdp, uint32 idx);
 #endif /* DHD_WET || DHD_MCAST_REGEN || DHD_L2_FILTER */
 
 /* Error bits */
-module_param(dhd_msg_level, int, 0);
+module_param(dhd_msg_level, int, 0600);
 
 #ifdef ARP_OFFLOAD_SUPPORT
 /* ARP offload enable */
 uint dhd_arp_enable = TRUE;
-module_param(dhd_arp_enable, uint, 0);
+module_param(dhd_arp_enable, uint, 0600);
 
 /* ARP offload agent mode : Enable ARP Host Auto-Reply and ARP Peer Auto-Reply */
 
 uint dhd_arp_mode = ARP_OL_AGENT | ARP_OL_PEER_AUTO_REPLY;
 
-module_param(dhd_arp_mode, uint, 0);
+module_param(dhd_arp_mode, uint, 0600);
 #endif /* ARP_OFFLOAD_SUPPORT */
 
 /* Disable Prop tx */
@@ -706,7 +706,7 @@ module_param_string(nvram_path, nvram_path, MOD_PARAM_PATHLEN, 0660);
 #define WATCHDOG_EXTEND_INTERVAL (2000)
 
 uint dhd_watchdog_ms = CUSTOM_DHD_WATCHDOG_MS;
-module_param(dhd_watchdog_ms, uint, 0);
+module_param(dhd_watchdog_ms, uint, 0600);
 
 #ifdef DHD_PCIE_RUNTIMEPM
 uint dhd_runtimepm_ms = CUSTOM_DHD_RUNTIME_MS;
@@ -718,36 +718,36 @@ module_param(dhd_console_ms, uint, 0644);
 #endif /* defined(DHD_DEBUG) */
 
 uint dhd_slpauto = TRUE;
-module_param(dhd_slpauto, uint, 0);
+module_param(dhd_slpauto, uint, 0600);
 
 #ifdef PKT_FILTER_SUPPORT
 /* Global Pkt filter enable control */
 uint dhd_pkt_filter_enable = TRUE;
-module_param(dhd_pkt_filter_enable, uint, 0);
+module_param(dhd_pkt_filter_enable, uint, 0600);
 #endif
 
 /* Pkt filter init setup */
 uint dhd_pkt_filter_init = 0;
-module_param(dhd_pkt_filter_init, uint, 0);
+module_param(dhd_pkt_filter_init, uint, 0600);
 
 /* Pkt filter mode control */
 uint dhd_master_mode = TRUE;
-module_param(dhd_master_mode, uint, 0);
+module_param(dhd_master_mode, uint, 0600);
 
 int dhd_watchdog_prio = 0;
-module_param(dhd_watchdog_prio, int, 0);
+module_param(dhd_watchdog_prio, int, 0600);
 
 /* DPC thread priority */
 int dhd_dpc_prio = CUSTOM_DPC_PRIO_SETTING;
-module_param(dhd_dpc_prio, int, 0);
+module_param(dhd_dpc_prio, int, 0600);
 
 /* RX frame thread priority */
 int dhd_rxf_prio = CUSTOM_RXF_PRIO_SETTING;
-module_param(dhd_rxf_prio, int, 0);
+module_param(dhd_rxf_prio, int, 0600);
 
 #if !defined(BCMDHDUSB)
 extern int dhd_dongle_ramsize;
-module_param(dhd_dongle_ramsize, int, 0);
+module_param(dhd_dongle_ramsize, int, 0600);
 #endif /* BCMDHDUSB */
 
 #ifdef WL_CFG80211
@@ -1245,7 +1245,7 @@ uint dhd_radio_up = 1;
 
 /* Network inteface name */
 char iface_name[IFNAMSIZ] = {'\0'};
-module_param_string(iface_name, iface_name, IFNAMSIZ, 0);
+module_param_string(iface_name, iface_name, IFNAMSIZ, 0600);
 
 /* The following are specific to the SDIO dongle */
 
@@ -1254,30 +1254,30 @@ int dhd_ioctl_timeout_msec = IOCTL_RESP_TIMEOUT;
 
 /* Idle timeout for backplane clock */
 int dhd_idletime = DHD_IDLETIME_TICKS;
-module_param(dhd_idletime, int, 0);
+module_param(dhd_idletime, int, 0600);
 
 /* Use polling */
 uint dhd_poll = FALSE;
-module_param(dhd_poll, uint, 0);
+module_param(dhd_poll, uint, 0600);
 
 /* Use interrupts */
 uint dhd_intr = TRUE;
-module_param(dhd_intr, uint, 0);
+module_param(dhd_intr, uint, 0600);
 
 /* SDIO Drive Strength (in milliamps) */
 uint dhd_sdiod_drive_strength = 6;
-module_param(dhd_sdiod_drive_strength, uint, 0);
+module_param(dhd_sdiod_drive_strength, uint, 0600);
 
 #ifdef BCMSDIO
 /* Tx/Rx bounds */
 extern uint dhd_txbound;
 extern uint dhd_rxbound;
-module_param(dhd_txbound, uint, 0);
-module_param(dhd_rxbound, uint, 0);
+module_param(dhd_txbound, uint, 0600);
+module_param(dhd_rxbound, uint, 0600);
 
 /* Deferred transmits */
 extern uint dhd_deferred_tx;
-module_param(dhd_deferred_tx, uint, 0);
+module_param(dhd_deferred_tx, uint, 0600);
 
 #endif /* BCMSDIO */
 
@@ -1285,18 +1285,18 @@ module_param(dhd_deferred_tx, uint, 0);
 #ifdef SDTEST
 /* Echo packet generator (pkts/s) */
 uint dhd_pktgen = 0;
-module_param(dhd_pktgen, uint, 0);
+module_param(dhd_pktgen, uint, 0600);
 
 /* Echo packet len (0 => sawtooth, max 2040) */
 uint dhd_pktgen_len = 0;
-module_param(dhd_pktgen_len, uint, 0);
+module_param(dhd_pktgen_len, uint, 0600);
 #endif /* SDTEST */
 
 
 
 /* Allow delayed firmware download for debug purpose */
 int allow_delay_fwdl = FALSE;
-module_param(allow_delay_fwdl, int, 0);
+module_param(allow_delay_fwdl, int, 0600);
 
 /* Flag to indicate whether FW download has succeeded */
 bool dhd_fw_downloaded = FALSE;

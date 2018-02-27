@@ -383,40 +383,40 @@ void bcmsdh_oob_intr_unregister(bcmsdh_info_t *bcmsdh)
 /* Module parameters specific to each host-controller driver */
 
 extern uint sd_msglevel;	/* Debug message level */
-module_param(sd_msglevel, uint, 0);
+module_param(sd_msglevel, uint, 0600);
 
 extern uint sd_power;	/* 0 = SD Power OFF, 1 = SD Power ON. */
-module_param(sd_power, uint, 0);
+module_param(sd_power, uint, 0600);
 
 extern uint sd_clock;	/* SD Clock Control, 0 = SD Clock OFF, 1 = SD Clock ON */
-module_param(sd_clock, uint, 0);
+module_param(sd_clock, uint, 0600);
 
 extern uint sd_divisor;	/* Divisor (-1 means external clock) */
-module_param(sd_divisor, uint, 0);
+module_param(sd_divisor, uint, 0600);
 
 extern uint sd_sdmode;	/* Default is SD4, 0=SPI, 1=SD1, 2=SD4 */
-module_param(sd_sdmode, uint, 0);
+module_param(sd_sdmode, uint, 0600);
 
 extern uint sd_hiok;	/* Ok to use hi-speed mode */
-module_param(sd_hiok, uint, 0);
+module_param(sd_hiok, uint, 0600);
 
 extern uint sd_f2_blocksize;
-module_param(sd_f2_blocksize, int, 0);
+module_param(sd_f2_blocksize, int, 0600);
 
 extern uint sd_f1_blocksize;
-module_param(sd_f1_blocksize, int, 0);
+module_param(sd_f1_blocksize, int, 0600);
 
 #ifdef BCMSDIOH_STD
 extern int sd_uhsimode;
-module_param(sd_uhsimode, int, 0);
+module_param(sd_uhsimode, int, 0600);
 extern uint sd_tuning_period;
-module_param(sd_tuning_period, uint, 0);
+module_param(sd_tuning_period, uint, 0600);
 extern int sd_delay_value;
-module_param(sd_delay_value, uint, 0);
+module_param(sd_delay_value, uint, 0600);
 
 /* SDIO Drive Strength for UHSI mode specific to SDIO3.0 */
 extern char dhd_sdiod_uhsi_ds_override[2];
-module_param_string(dhd_sdiod_uhsi_ds_override, dhd_sdiod_uhsi_ds_override, 2, 0);
+module_param_string(dhd_sdiod_uhsi_ds_override, dhd_sdiod_uhsi_ds_override, 2, 0600);
 
 #endif
 
