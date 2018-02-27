@@ -67,6 +67,8 @@
 #include <dhdioctl.h>
 #include <sdiovar.h>
 
+#include <dhd_somc_custom.h>
+
 #ifdef PROP_TXSTATUS
 #include <dhd_wlfc.h>
 #endif
@@ -7925,6 +7927,12 @@ dhdsdio_download_nvram(struct dhd_bus *bus)
 
 	if (len > 0 && len < MAX_NVRAMBUF_SIZE) {
 		bufp = (char *)memblock;
+
+		if (somc_txpower_calibrate(memblock, len) != BCME_OK) {
+			DHD_ERROR(("%s: error calibrating tx power\n", __FUNCTION__));
+			goto err;
+		}
+
 		bufp[len] = 0;
 		len = process_nvram_vars(bufp, len);
 		if (len % 4) {
