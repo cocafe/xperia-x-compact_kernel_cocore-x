@@ -17,25 +17,81 @@
 
 static dhd_info_t *dhd_info_p;
 
-#if 0
-static ssize_t #NAME#_show(struct kobject *kobj,
-                           struct kobj_attribute *attr,
-                           char *buf)
+enum DHD_IOCTL_OP {
+	DHD_IOCTL_OP_NONE = 0,
+	DHD_IOCTL_OP_GET,
+	DHD_IOCTL_OP_SET,
+};
+
+static int dhd_ioctl_last_op = DHD_IOCTL_OP_NONE;
+static int dhd_ioctl_last_cmd;
+static int dhd_ioctl_last_val;
+
+static ssize_t dhd_ioctl_show(struct kobject *kobj,
+                                   struct kobj_attribute *attr,
+                                   char *buf)
 {
-	return strlen(buf);
+	int ret;
+
+	switch (dhd_ioctl_last_op) {
+		case DHD_IOCTL_OP_GET:
+			ret = dhd_wl_ioctl_cmd(&dhd_info_p->pub,
+			                       dhd_ioctl_last_cmd,
+			                       &dhd_ioctl_last_val,
+			                       sizeof(dhd_ioctl_last_val),
+			                       FALSE,
+			                       0);
+			if (ret) {
+				pr_err("%s: failed to get ioctl cmd\n", __func__);
+				return -EIO;
+			}
+
+			return sprintf(buf, "%d\n", dhd_ioctl_last_val);
+
+		case DHD_IOCTL_OP_SET:
+		case DHD_IOCTL_OP_NONE:
+		default:
+			return -ENODATA;
+	}
 }
 
-static ssize_t #NAME#_store(struct kobject *kobj,
-                            struct kobj_attribute *attr,
-                            const char *buf,
-                            size_t count)
+static ssize_t dhd_ioctl_store(struct kobject *kobj,
+                                    struct kobj_attribute *attr,
+                                    const char *buf,
+                                    size_t count)
 {
+	int cmd;
+	int val;
+	int ret;
+
+	if (sscanf(buf, "set %d %d", &cmd, &val) == 2) {
+		dhd_ioctl_last_op = DHD_IOCTL_OP_SET;
+
+		ret = dhd_wl_ioctl_cmd(&dhd_info_p->pub, cmd, &val, sizeof(val), TRUE, 0);
+		if (ret) {
+			pr_err("%s: failed to set ioctl cmd\n", __func__);
+			return -EIO;
+		}
+	} else if (sscanf(buf, "get %d", &cmd) == 1) {
+		dhd_ioctl_last_op = DHD_IOCTL_OP_GET;
+
+		ret = dhd_wl_ioctl_cmd(&dhd_info_p->pub, cmd, &val, sizeof(val), FALSE, 0);
+		if (ret) {
+			pr_err("%s: failed to get ioctl cmd\n", __func__);
+			return -EIO;
+		}
+
+		dhd_ioctl_last_cmd = cmd;
+		dhd_ioctl_last_val = val;
+	} else {
+		return -EINVAL;
+	}
+
 	return count;
 }
 
-static struct kobj_attribute #NAME#_interface =
-	__ATTR(#NAME#, 0644, #NAME#_show, #NAME#_store);
-#endif
+static struct kobj_attribute dhd_ioctl_interface =
+	__ATTR(ioctl, 0600, dhd_ioctl_show, dhd_ioctl_store);
 
 #if defined(DHD_TRACE_WAKE_LOCK)
 extern int trace_wklock_onoff;
@@ -78,6 +134,7 @@ static struct kobj_attribute wakelock_trace_interface =
 #endif /* DHD_TRACE_WAKE_LOCK */
 
 static struct attribute *dhd_attrs[] = {
+	&dhd_ioctl_interface.attr,
 #if defined(DHD_TRACE_WAKE_LOCK)
 	&wakelock_trace_interface.attr,
 #endif /* DHD_TRACE_WAKE_LOCK */
@@ -85,7 +142,7 @@ static struct attribute *dhd_attrs[] = {
 };
 
 static struct attribute_group dhd_interface_group = {
-	// .name  = "bcmdhd", // namd to make sub folder
+	// .name  = "bcmdhd", // name to make sub folder
 	.attrs = dhd_attrs,
 };
 
