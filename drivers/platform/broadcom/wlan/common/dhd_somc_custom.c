@@ -74,6 +74,10 @@ static const char *somc_ta_paths_override[] = {
 #define SOMC_TXPWR_MAX 127
 #define SOMC_TXPWR_5G 0x20
 
+#define FULL_TXPWR_VAR "/data/etc/wlan_txpower_full"
+
+static int dhd_full_txpower = -1;
+
 typedef struct {
 	char *key;  /* Key for tx power (see the definitions above) */
 	int len;    /* Length of a unit of PPR (not incl. "0x") */
@@ -345,15 +349,52 @@ int somc_txpower_calibrate(char *nvram, int nvram_len)
 	return BCME_OK;
 }
 
+void somc_check_full_txpower(void)
+{
+	struct file *fp = NULL;
+
+	fp = filp_open(FULL_TXPWR_VAR, O_RDONLY, 0);
+	if (IS_ERR(fp)) {
+		if (PTR_ERR(fp) == -ENOENT) {
+			DHD_ERROR(("%s: var does not exist: %s\n",
+			           __FUNCTION__, FULL_TXPWR_VAR));
+		}
+
+		dhd_full_txpower = 0;
+
+		return;
+	}
+
+	pr_info("%s: enable full txpower\n", __func__);
+
+	dhd_full_txpower = 1;
+
+	if (fp)
+		filp_close(fp, NULL);
+}
+
 int somc_update_qtxpower(char *buf, char band, int chain)
 {
 	int in_qdbm, power;
-	int delta = somc_txpower_get_min_delta((band & SOMC_TXPWR_5G) != 0, chain);
+	int delta;
 
 	in_qdbm = *buf;
 
 	if (in_qdbm < 0 || SOMC_TXPWR_MAX < in_qdbm)
 		return -1;
+
+	if (dhd_full_txpower == -1)
+		somc_check_full_txpower();
+
+	if (dhd_full_txpower) {
+		delta = 0;
+		power = SOMC_TXPWR_MAX;
+		*buf = (char)power;
+
+		goto out;
+	}
+
+	delta = somc_txpower_get_min_delta((band & SOMC_TXPWR_5G) != 0, chain);
 
 	/* convert unit for calculation since 'delta' uses 1/100dB step */
 	power = in_qdbm + delta / (100 / 4);
@@ -364,6 +405,7 @@ int somc_update_qtxpower(char *buf, char band, int chain)
 	}
 	*buf = (char)power;
 
+out:
 	printk("%s: Set max tx power: %d->%d qdBm (delta=%d) (%s) (chain%d)\n",
 		  __FUNCTION__, in_qdbm, power, delta,
 		  (band & SOMC_TXPWR_5G) ? "5G" : "2_4G", chain);
