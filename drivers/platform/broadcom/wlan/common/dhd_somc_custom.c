@@ -74,9 +74,10 @@ static const char *somc_ta_paths_override[] = {
 #define SOMC_TXPWR_MAX 127
 #define SOMC_TXPWR_5G 0x20
 
-#define FULL_TXPWR_VAR "/data/etc/wlan_txpower_full"
+#define SOMC_TXPWR_MANUAL "/data/etc/wlan_txpower_allrates"
 
-static int dhd_full_txpower = -1;
+static int dhd_set_txpower = -1;
+static int dhd_txpower_allrates;
 
 typedef struct {
 	char *key;  /* Key for tx power (see the definitions above) */
@@ -349,28 +350,36 @@ int somc_txpower_calibrate(char *nvram, int nvram_len)
 	return BCME_OK;
 }
 
-void somc_check_full_txpower(void)
+int somc_manual_txpower_set(void)
 {
-	struct file *fp = NULL;
+	char buf[SOMC_MAX_TABUF_SIZE];
+	int val;
+	int ret = 0;
 
-	fp = filp_open(FULL_TXPWR_VAR, O_RDONLY, 0);
-	if (IS_ERR(fp)) {
-		if (PTR_ERR(fp) == -ENOENT) {
-			DHD_ERROR(("%s: var does not exist: %s\n",
-			           __FUNCTION__, FULL_TXPWR_VAR));
-		}
-
-		dhd_full_txpower = 0;
-
-		return;
+	ret = somc_read_file(SOMC_TXPWR_MANUAL, buf, sizeof(buf));
+	if (ret != 0) {
+		pr_info("%s: custom txpower file not exists\n", __func__);
+		return ret;
 	}
 
-	pr_info("%s: enable full txpower\n", __func__);
+	ret = sscanf(buf, "%d", &val);
+	if (ret != 1) {
+		pr_err("%s: incorrect txpower file\n", __func__);
+		return ret;
+	}
 
-	dhd_full_txpower = 1;
+	if (val > 127)
+		val = 127;
+	else if (val < 0)
+		val = 0;
 
-	if (fp)
-		filp_close(fp, NULL);
+	dhd_txpower_allrates = val;
+	dhd_set_txpower = 1;
+
+	pr_info("%s: set all rates txpower to %u (%udBm)\n", __func__,
+	        dhd_txpower_allrates, (dhd_txpower_allrates + 1) / 4);
+
+	return ret;
 }
 
 int somc_update_qtxpower(char *buf, char band, int chain)
@@ -383,12 +392,12 @@ int somc_update_qtxpower(char *buf, char band, int chain)
 	if (in_qdbm < 0 || SOMC_TXPWR_MAX < in_qdbm)
 		return -1;
 
-	if (dhd_full_txpower == -1)
-		somc_check_full_txpower();
+	if (dhd_set_txpower == -1)
+		somc_manual_txpower_set();
 
-	if (dhd_full_txpower) {
+	if (dhd_set_txpower) {
 		delta = 0;
-		power = SOMC_TXPWR_MAX;
+		power = dhd_txpower_allrates;
 		*buf = (char)power;
 
 		goto out;
