@@ -882,6 +882,9 @@ void dhd_enable_packet_filter(int value, dhd_pub_t *dhd)
 #endif /* PKT_FILTER_SUPPORT */
 }
 
+int pm_mode_suspend = PM_FAST;
+module_param(pm_mode_suspend, int, 0600);
+
 static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 {
 #ifndef SUPPORT_PM2_ONLY
@@ -918,8 +921,8 @@ static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 				DHD_ERROR(("%s: force extra Suspend setting \n", __FUNCTION__));
 
 #ifndef SUPPORT_PM2_ONLY
-				dhd_wl_ioctl_cmd(dhd, WLC_SET_PM, (char *)&power_mode,
-				                 sizeof(power_mode), TRUE, 0);
+				dhd_wl_ioctl_cmd(dhd, WLC_SET_PM, (char *)&pm_mode_suspend,
+				                 sizeof(pm_mode_suspend), TRUE, 0);
 #endif /* SUPPORT_PM2_ONLY */
 
 				/* Enable packet filter, only allow unicast packet to send up */
