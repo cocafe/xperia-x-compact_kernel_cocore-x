@@ -48,6 +48,7 @@
 #ifdef GET_CUSTOM_MAC_ENABLE
 #define MACADDR_BUF_LEN 64
 #define MACADDR_PATH "/data/etc/wlan_macaddr0"
+#define MACADDR_PATH_OVERRIDE "/data/etc/wlan_macaddr0_override"
 #endif /* GET_CUSTOM_MAC_ENABLE */
 
 #if defined(OOB_INTR_ONLY)
@@ -132,10 +133,17 @@ int somc_get_mac_address(unsigned char *buf)
 	if (!buf)
 		return -EINVAL;
 
-	fp = dhd_os_open_image(MACADDR_PATH);
+	fp = dhd_os_open_image(MACADDR_PATH_OVERRIDE);
 	if (!fp) {
-		WL_ERROR(("%s: file open error\n", __FUNCTION__));
-		goto err;
+		WL_ERROR(("%s: custom mac address not defined\n", __FUNCTION__));
+
+		fp = dhd_os_open_image(MACADDR_PATH);
+		if (!fp) {
+			WL_ERROR(("%s: file open error\n", __FUNCTION__));
+			goto err;
+		}
+	} else {
+		WL_ERROR(("%s: mac address override by user defined\n", __FUNCTION__));
 	}
 
 	len = dhd_os_get_image_block(macaddr_buf, MACADDR_BUF_LEN, fp);
