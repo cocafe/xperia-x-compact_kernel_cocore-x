@@ -3557,6 +3557,7 @@ static struct net_device_ops dhd_ops_virt = {
 extern void debugger_init(void *bus_handle);
 #endif
 
+#include "dhd_sysfs.c"
 
 dhd_pub_t *
 dhd_attach(osl_t *osh, struct dhd_bus *bus, uint bus_hdrlen)
@@ -3817,6 +3818,9 @@ dhd_attach(osl_t *osh, struct dhd_bus *bus, uint bus_hdrlen)
 
 	dhd->unit = dhd_found + instance_base;
 	dhd_found++;
+
+	dhd_sysfs_init(dhd);
+
 	return &dhd->pub;
 
 fail:
@@ -5717,6 +5721,8 @@ void dhd_detach(dhd_pub_t *dhdp)
 	/* This will free all MEM allocated for TCPACK SUPPRESS */
 	dhd_tcpack_suppress_set(&dhd->pub, TCPACK_SUP_OFF);
 #endif /* DHDTCPACK_SUPPRESS */
+
+	dhd_sysfs_exit(dhd);
 }
 
 
