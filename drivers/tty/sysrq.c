@@ -134,6 +134,8 @@ static void sysrq_handle_crash(int key)
 {
 	char *killer = NULL;
 
+	return;
+
 	panic_on_oops = 1;	/* force panic */
 	wmb();
 	*killer = 1;
@@ -1025,6 +1027,8 @@ static ssize_t write_sysrq_trigger(struct file *file, const char __user *buf,
 {
 	if (count) {
 		char c;
+
+		pr_info("%s: proc: %s\n", __func__, current->comm);
 
 		if (get_user(c, buf))
 			return -EFAULT;
