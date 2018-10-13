@@ -1,6 +1,6 @@
 /*
 * Customer code to add GPIO control during WLAN start/stop
-* Copyright (C) 1999-2017, Broadcom Corporation
+* Copyright (C) 1999-2018, Broadcom Corporation
 * Copyright (C) 2013 Sony Mobile Communications Inc.
 * 
 *      Unless you and Broadcom execute a separate written software license
@@ -48,7 +48,6 @@
 #ifdef GET_CUSTOM_MAC_ENABLE
 #define MACADDR_BUF_LEN 64
 #define MACADDR_PATH "/data/etc/wlan_macaddr0"
-#define MACADDR_PATH_OVERRIDE "/data/etc/wlan_macaddr0_override"
 #endif /* GET_CUSTOM_MAC_ENABLE */
 
 #if defined(OOB_INTR_ONLY)
@@ -133,17 +132,10 @@ int somc_get_mac_address(unsigned char *buf)
 	if (!buf)
 		return -EINVAL;
 
-	fp = dhd_os_open_image(MACADDR_PATH_OVERRIDE);
+	fp = dhd_os_open_image(MACADDR_PATH);
 	if (!fp) {
-		WL_ERROR(("%s: custom mac address not defined\n", __FUNCTION__));
-
-		fp = dhd_os_open_image(MACADDR_PATH);
-		if (!fp) {
-			WL_ERROR(("%s: file open error\n", __FUNCTION__));
-			goto err;
-		}
-	} else {
-		WL_ERROR(("%s: mac address override by user defined\n", __FUNCTION__));
+		WL_ERROR(("%s: file open error\n", __FUNCTION__));
+		goto err;
 	}
 
 	len = dhd_os_get_image_block(macaddr_buf, MACADDR_BUF_LEN, fp);

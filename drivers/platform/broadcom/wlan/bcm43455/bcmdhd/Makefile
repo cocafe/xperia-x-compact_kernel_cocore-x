@@ -10,8 +10,7 @@ DHDCFLAGS = -Wall -Wstrict-prototypes -Dlinux -DLINUX -DBCMDRIVER             \
         -DMMC_SDIO_ABORT -DBCMSDIO -DBCMLXSDMMC -DWLP2P                       \
         -DWIFI_ACT_FRAME -DARP_OFFLOAD_SUPPORT                                \
         -DKEEP_ALIVE -DCSCAN -DPKT_FILTER_SUPPORT                             \
-        -DEMBEDDED_PLATFORM -DPNO_SUPPORT                                     \
-        -DCONFIG_DTS
+        -DEMBEDDED_PLATFORM -DPNO_SUPPORT
 
 ####################
 # Common feature
@@ -35,6 +34,7 @@ DHDCFLAGS += -DPROP_TXSTATUS
 DHDCFLAGS += -DWL_CFG80211_VSDB_PRIORITIZE_SCAN_REQUEST
 # For p2p connection issue
 DHDCFLAGS += -DWL_SCB_TIMEOUT=10
+
 # For Kernel ver > 3.6 or Kernel Patch required
 DHDCFLAGS += -DWL_SUPPORT_CHAN_BW
 
@@ -121,7 +121,7 @@ DHDCFLAGS += -DDISABLE_TXBFR
 DHDCFLAGS += -DDHD_DONOT_FORWARD_BCMEVENT_AS_NETWORK_PKT
 
 # Disable to delay link down event
-DHDCFLAGS += -DDISABLE_BCN_DLY
+#DHDCFLAGS += -DDISABLE_BCN_DLY
 
 ##############################
 # Android Platform Definition
@@ -137,10 +137,6 @@ DHDCFLAGS += -DWL_CFG80211_STA_EVENT
 DHDCFLAGS += -DWL_IFACE_COMB_NUM_CHANNELS
 # To support p2p private command on kernel 3.8 or above
 DHDCFLAGS += -DWL_NEWCFG_PRIVCMD_SUPPORT
-
-ifeq ($(CONFIG_BCMDHD_INSMOD_NO_FW_LOAD),y)
-  DHDCFLAGS += -DENABLE_INSMOD_NO_FW_LOAD
-endif
 
 ifneq ($(CONFIG_DHD_USE_SCHED_SCAN),)
 DHDCFLAGS += -DWL_SCHED_SCAN
@@ -344,84 +340,24 @@ endif
   # Radio_stat v2 - data structure is updated
   DHDCFLAGS += -DLINKSTAT_V2
 
-  DHDCFLAGS += -DWL_ABORT_SCAN
+# DHDCFLAGS += -DWL_ABORT_SCAN
 endif
 
-# Read custom mac address function
-DHDCFLAGS += -DGET_CUSTOM_MAC_ENABLE
-
-# Default Beacon timeout
-  DHDCFLAGS += -DSOMC_WLAN_BCN_TIMEOUT=3
-
-# The number of the maximum devices which phone can associate
-  DHDCFLAGS += -DSOMC_MAX_ASSOC_NUM=10
-
-# Default Listen Interval in Beacons
-  DHDCFLAGS += -DCUSTOM_LISTEN_INTERVAL=5
-
-# WAPI
-  DHDCFLAGS += -DBCMWAPI_WPI -DBCMWAPI_WAI
-
-# Set the number of probe requests per channel
-ifneq ($(CONFIG_SOMC_WLAN_SCAN_NPROBES),)
-  # Not sure about SOMC settings
-  DHDCFLAGS += -DSOMC_WLAN_SCAN_NPROBES=$(CONFIG_SOMC_WLAN_SCAN_NPROBES)
-endif
-
-# Set default nvram path
-ifneq ($(CONFIG_SOMC_WLAN_NVRAM_PATH),)
-  DHDCFLAGS += -DCONFIG_BCMDHD_NVRAM_PATH=\"$(CONFIG_SOMC_WLAN_NVRAM_PATH)\"
-endif
-
-# Enable to use Ukraine CCODE (UA/999)
-DHDCFLAGS += -DENABLE_80211AC_FOR_UA
-
-EXTRA_LDFLAGS += --strip-debug
+#EXTRA_LDFLAGS += --strip-debug
 EXTRA_CFLAGS += $(DHDCFLAGS) -DDHD_DEBUG
 EXTRA_CFLAGS += -DSRCBASE=\"$(src)\"
-EXTRA_CFLAGS += -I$(src)/include/ \
-		            -I$(src)/ \
-		            -I$(src)/../../common/ \
-                -I$(LINUXDIR)/include \
-                -I$(shell pwd)
+EXTRA_CFLAGS += -I$(src)/include/ -I$(src)/ -I$(src)/../../common
+KBUILD_CFLAGS += -I$(LINUXDIR)/include -I$(shell pwd)
 
-MODNAME := wlan
-
-DHDOFILES := bcmsdh.o \
-		bcmsdh_linux.o \
-		bcmsdh_sdmmc.o \
-		bcmsdh_sdmmc_linux.o \
-		dhd_cdc.o \
-		dhd_cfg80211.o \
-		dhd_common.o \
-		dhd_custom_gpio.o \
-		dhd_ip.o \
-		dhd_linux.o \
-		dhd_linux_sched.o \
-		dhd_sdio.o \
-		dhd_pno.o \
-		dhd_wlfc.o \
-		dhd_linux_wq.o \
-		aiutils.o \
-		bcmevent.o \
-		bcmutils.o \
-		bcmwifi_channels.o \
-		hndpmu.o \
-		linux_osl.o \
-		sbutils.o \
-		siutils.o \
-		wldev_common.o \
-		wl_cfg_btcoex.o \
-		wl_android.o \
-		wl_cfg80211.o \
-		wl_cfgp2p.o \
-		wl_linux_mon.o \
-		dhd_linux_platdev.o \
-		../../common/dhd_somc_custom.o
+DHDOFILES = bcmsdh.o bcmsdh_linux.o bcmsdh_sdmmc.o bcmsdh_sdmmc_linux.o \
+	dhd_cdc.o dhd_cfg80211.o dhd_common.o dhd_custom_gpio.o dhd_ip.o    \
+	dhd_linux.o dhd_linux_sched.o dhd_sdio.o dhd_pno.o dhd_wlfc.o dhd_linux_wq.o aiutils.o       \
+	bcmevent.o bcmutils.o bcmwifi_channels.o hndpmu.o linux_osl.o       \
+	sbutils.o siutils.o wldev_common.o wl_cfg_btcoex.o wl_android.o wl_cfg80211.o       \
+	wl_cfgp2p.o wl_linux_mon.o dhd_linux_platdev.o ../../common/dhd_somc_custom.o
 
 DHDOFILES += $(ANDROID_OFILES)
 
-# Module information used by KBuild framework
-obj-$(CONFIG_BCMDHD) += $(MODNAME).o
+obj-$(CONFIG_BCMDHD) += bcmdhd.o
+bcmdhd-objs += $(DHDOFILES)
 
-$(MODNAME)-y := $(DHDOFILES)
