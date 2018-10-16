@@ -347,7 +347,7 @@
 			reg = <0x2000 0x100>;
 			regulator-name = "pm8950_s5";
 			regulator-min-microvolt = <500000>;
-			regulator-max-microvolt = <1165000>;
+			regulator-max-microvolt = <1350000>;
 			qcom,cpu-num = <0>;
 		};
 	};
@@ -359,7 +359,7 @@
 			reg = <0x1700 0x100>;
 			regulator-name = "pm8004_s2";
 			regulator-min-microvolt = <500000>;
-			regulator-max-microvolt = <1165000>;
+			regulator-max-microvolt = <1350000>;
 			qcom,cpu-num = <4>;
 		};
 
@@ -369,7 +369,7 @@
 			reg = <0x2000 0x100>;
 			regulator-name = "pm8004_s5";
 			regulator-min-microvolt = <500000>;
-			regulator-max-microvolt = <1165000>;
+			regulator-max-microvolt = <1350000>;
 			qcom,auto-mode-enable = <1>;
 			qcom,enable-time = <500>;
 		};
@@ -388,7 +388,7 @@
 		regulator-max-microvolt = <9>;
 
 		qcom,cpr-fuse-corners = <3>;
-		qcom,cpr-voltage-ceiling = <950000 1050000 1165000>;
+		qcom,cpr-voltage-ceiling = <950000 1050000 1350000>;
 		qcom,cpr-voltage-floor =   <795000  835000  930000>;
 		vdd-apc-supply = <&pm8950_s5>;
 
@@ -487,7 +487,7 @@
 		regulator-max-microvolt = <9>;
 
 		qcom,cpr-fuse-corners = <3>;
-		qcom,cpr-voltage-ceiling = <950000 1050000 1165000>;
+		qcom,cpr-voltage-ceiling = <950000 1050000 1350000>;
 		qcom,cpr-voltage-floor =   <790000  820000  915000>;
 		vdd-apc-supply = <&pm8004_s2>;
 
