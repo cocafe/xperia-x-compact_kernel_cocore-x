@@ -3650,6 +3650,10 @@ static int msm_gcc_probe(struct platform_device *pdev)
 	regval |= BIT(2);
 	writel_relaxed(regval, GCC_REG_BASE(APSS_MISC));
 
+	/* Configure camss_top_ahb_clk_src */
+	clk_set_rate(&camss_top_ahb_clk_src.c, 80000000);
+	clk_prepare_enable(&camss_top_ahb_clk_src.c);
+
 	dev_info(&pdev->dev, "Registered GCC clocks\n");
 
 	return 0;
