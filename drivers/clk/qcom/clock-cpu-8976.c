@@ -964,6 +964,10 @@ static int clock_cpu_probe(struct platform_device *pdev)
 
 	get_speed_bin(pdev, &speed_bin, &version);
 
+	pr_info("%s: force speed bin 0 version 0\n", __func__);
+	speed_bin = 0;
+	version = 0;
+
 	rc = cpu_parse_devicetree(pdev);
 	if (rc)
 		return rc;
