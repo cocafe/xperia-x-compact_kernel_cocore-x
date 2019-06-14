@@ -36,7 +36,7 @@
 #include "u_bam_data.h"
 #include <linux/rndis_ipa.h>
 
-unsigned int rndis_dl_max_xfer_size = 9216;
+unsigned int rndis_dl_max_xfer_size = 0;
 module_param(rndis_dl_max_xfer_size, uint, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(rndis_dl_max_xfer_size,
 		"Max size of bus transfer to host");
