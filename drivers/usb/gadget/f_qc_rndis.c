@@ -36,10 +36,21 @@
 #include "u_bam_data.h"
 #include <linux/rndis_ipa.h>
 
+unsigned int ul_max_xfer_size = 0;
+module_param(ul_max_xfer_size, uint, S_IRUGO);
+
+unsigned int dl_max_xfer_size = 0;
+module_param(dl_max_xfer_size, uint, S_IRUGO);
+
 unsigned int rndis_dl_max_xfer_size = 0;
 module_param(rndis_dl_max_xfer_size, uint, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(rndis_dl_max_xfer_size,
 		"Max size of bus transfer to host");
+
+unsigned int rndis_dl_max_xfer_size_by_host = 1;
+module_param(rndis_dl_max_xfer_size_by_host, uint, S_IRUGO | S_IWUSR);
+MODULE_PARM_DESC(rndis_dl_max_xfer_size_by_host,
+		"Follow host negotiated max xfer size");
 
 /*
  * This function is an RNDIS Ethernet port -- a Microsoft protocol that's
@@ -540,7 +551,6 @@ static void rndis_qc_command_complete(struct usb_ep *ep,
 	struct f_rndis_qc		*rndis = req->context;
 	int				status;
 	rndis_init_msg_type		*buf;
-	u32		ul_max_xfer_size, dl_max_xfer_size;
 
 	/* received RNDIS command from USB_CDC_SEND_ENCAPSULATED_COMMAND */
 	status = rndis_msg_parser(rndis->config, (u8 *) req->buf);
@@ -562,12 +572,13 @@ static void rndis_qc_command_complete(struct usb_ep *ep,
 		 * minimum out of host provided value and optimum transfer size
 		 * to get 7KB as aggregation byte limit.
 		 */
-		if (rndis_dl_max_xfer_size)
+		if (rndis_dl_max_xfer_size && !rndis_dl_max_xfer_size_by_host)
 			dl_max_xfer_size = min_t(u32, rndis_dl_max_xfer_size,
 				rndis_get_dl_max_xfer_size(rndis->config));
 		else
 			dl_max_xfer_size =
 				rndis_get_dl_max_xfer_size(rndis->config);
+
 		u_bam_data_set_dl_max_xfer_size(dl_max_xfer_size);
 	}
 }
