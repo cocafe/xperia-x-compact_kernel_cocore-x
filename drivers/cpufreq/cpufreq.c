@@ -22,6 +22,7 @@
 #include <linux/delay.h>
 #include <linux/device.h>
 #include <linux/init.h>
+#include <linux/sched.h>
 #include <linux/kernel_stat.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
@@ -455,7 +456,10 @@ static ssize_t store_##file_name					\
 	policy->user_policy.min = new_policy.min;			\
 	policy->user_policy.max = new_policy.max;			\
 									\
-	ret = cpufreq_set_policy(policy, &new_policy);		\
+	pr_info("%s: proc: %s args: %s\n", 				\
+	        __func__, current->comm, buf); 				\
+									\
+	ret = cpufreq_set_policy(policy, &new_policy);			\
 									\
 	return ret ? ret : count;					\
 }

@@ -154,3 +154,46 @@ config CPU_FREQ_MSM
         default y
         help
           This enables the CPUFreq driver for Qualcomm CPUs.
+
+config CPU_FREQ_MSM_LIMIT
+	bool
+	depends on CPU_FREQ_MSM
+	default n
+	help
+	  This enables min and max limits on msm cpu
+
+config CPU_FREQ_MSM_A53_POLICY_CPU
+	int
+	depends on CPU_FREQ_MSM_LIMIT
+	default 0
+	help
+
+config CPU_FREQ_MSM_A53_MIN_FREQ
+	int
+	depends on CPU_FREQ_MSM_LIMIT
+	default 400000
+	help
+
+config CPU_FREQ_MSM_A53_MAX_FREQ
+	int
+	depends on CPU_FREQ_MSM_LIMIT
+	default 1401000
+	help
+
+config CPU_FREQ_MSM_A72_POLICY_CPU
+	int
+	depends on CPU_FREQ_MSM_LIMIT
+	default 4
+	help
+
+config CPU_FREQ_MSM_A72_MIN_FREQ
+	int
+	depends on CPU_FREQ_MSM_LIMIT
+	default 400000
+	help
+
+config CPU_FREQ_MSM_A72_MAX_FREQ
+	int
+	depends on CPU_FREQ_MSM_LIMIT
+	default 1804800
+	help

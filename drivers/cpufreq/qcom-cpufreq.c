@@ -24,6 +24,7 @@
 #include <linux/cpumask.h>
 #include <linux/suspend.h>
 #include <linux/clk.h>
+#include <linux/clk/msm-clk-provider.h>
 #include <linux/err.h>
 #include <linux/platform_device.h>
 #include <linux/of.h>
@@ -388,6 +389,8 @@ static int __init msm_cpufreq_probe(struct platform_device *pdev)
 	l2_clk = devm_clk_get(dev, "l2_clk");
 	if (IS_ERR(l2_clk))
 		l2_clk = NULL;
+	else
+		pr_info("%s: l2_clk: %s\n", __func__, l2_clk->dbg_name);
 
 	for_each_possible_cpu(cpu) {
 		snprintf(clk_name, sizeof(clk_name), "cpu%d_clk", cpu);
@@ -395,6 +398,8 @@ static int __init msm_cpufreq_probe(struct platform_device *pdev)
 		if (IS_ERR(c))
 			return PTR_ERR(c);
 		cpu_clk[cpu] = c;
+
+		pr_info("%s: cpu_clk%d: %s\n", __func__, cpu, c->dbg_name);
 	}
 	hotplug_ready = true;
 
