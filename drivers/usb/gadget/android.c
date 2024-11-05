@@ -909,7 +909,7 @@ static struct android_usb_function rmnet_smd_function = {
 
 /*rmnet transport string format(per port):"ctrl0,data0,ctrl1,data1..." */
 #define MAX_XPORT_STR_LEN 50
-static char rmnet_transports[MAX_XPORT_STR_LEN];
+static char rmnet_transports[MAX_XPORT_STR_LEN] = "NONE,ETHER";
 
 /*rmnet transport name string - "rmnet_hsic[,rmnet_hsusb]" */
 static char rmnet_xport_names[MAX_XPORT_STR_LEN];

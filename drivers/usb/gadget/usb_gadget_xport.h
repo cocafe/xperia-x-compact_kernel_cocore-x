@@ -86,7 +86,7 @@ static enum transport_type str_to_xport(const char *name)
 		return USB_GADGET_XPORT_ETHER;
 	if (!strncasecmp("BAM_DMUX", name, XPORT_STR_LEN))
 		return USB_GADGET_XPORT_BAM_DMUX;
-	if (!strncasecmp("", name, XPORT_STR_LEN))
+	if (!strncasecmp("NONE", name, XPORT_STR_LEN))
 		return USB_GADGET_XPORT_NONE;
 
 	return USB_GADGET_XPORT_UNDEF;
