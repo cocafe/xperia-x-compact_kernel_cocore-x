@@ -49,6 +49,17 @@ static int __init proc_cmdline_init(void)
 		memmove(offset_addr, &cmd[offset + i + 1], len - i - offset);
 	}
 
+	offset_addr = strstr(cmd, "startup=");
+	if (offset_addr) {
+		const char *magic = "0x00000001"; // BIT 1 = POWER KEY | BIT 3 = CHARGING
+		char *s = &offset_addr[8]; // locate 0x00000000
+		size_t i;
+
+		for (i = 0; i < strlen(magic); i++) {
+			s[i] = magic[i];
+		}
+	}
+
 	proc_create("cmdline", 0, NULL, &cmdline_proc_fops);
 	return 0;
 }
