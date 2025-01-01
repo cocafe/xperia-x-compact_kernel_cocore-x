@@ -4332,10 +4332,10 @@ dhd_rx_frame(dhd_pub_t *dhdp, int ifidx, void *pktbuf, int numpkt, uint8 chan)
 				}
 			}
 
-			if (numpkt != 1) {
-				DHD_ERROR(("%s: Got BRCM event packet in a chained packet.\n",
-				__FUNCTION__));
-			}
+			// if (numpkt != 1) {
+			// 	DHD_ERROR(("%s: Got BRCM event packet in a chained packet.\n",
+			// 	__FUNCTION__));
+			// }
 #ifdef SHOW_LOGTRACE
 			if (dhd_watchdog_ms && event.event_type == WLC_E_TRACE) {
 				DHD_TRACE(("%s: WLC_E_TRACE\n", __FUNCTION__));
