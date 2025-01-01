@@ -28,6 +28,9 @@
 #include <linux/mm.h>
 #include <linux/shrinker.h>
 
+#include <linux/module.h>
+#include <linux/moduleparam.h>
+
 #include <linux/oom_score_notifier.h>
 #include "lowmemorykiller.h"
 #include "lowmemorykiller_tasks.h"
@@ -47,6 +50,24 @@ static unsigned long lowmem_count_tng(struct shrinker *s,
 				      struct shrink_control *sc);
 static unsigned long lowmem_scan_tng(struct shrinker *s,
 				     struct shrink_control *sc);
+
+static char *proc_white_list[] = {
+	"com.termux",
+	"com.cocafe.obdhub",
+	"hostapd",
+	"prometheus",
+	"grafana",
+	"victoria-metric",
+	"tmux",
+	"bash",
+	"proot",
+	"canbus-hub",
+	"file_metric_server",
+	"daemonsu",
+};
+
+static int white_list_enabled = 1;
+module_param(white_list_enabled, int, 0644);
 
 static int lowmem_shrink_tng(struct shrinker *s, struct shrink_control *sc)
 {
@@ -209,6 +230,7 @@ static unsigned long lowmem_scan_tng(struct shrinker *s,
 	struct lmk_rb_watch *lrw;
 	int do_kill;
 	struct calculated_params cp;
+	size_t i;
 
 	lmk_inc_stats(LMK_SCAN);
 
@@ -218,11 +240,23 @@ static unsigned long lowmem_scan_tng(struct shrinker *s,
 	lrw = __lmk_task_first();
 	if (lrw) {
 		cp.selected_tasksize = get_task_rss(lrw->tsk);
+
 		do_kill = kill_needed(lrw->key, sc->gfp_mask, &cp);
 		if (death_pending_len >= cp.dynamic_max_queue_len) {
 			lmk_inc_stats(LMK_BUSY);
 			cp.selected_tasksize = SHRINK_STOP;
 			goto unlock_out;
+		}
+
+		if (white_list_enabled) {
+			for (i = 0; i < ARRAY_SIZE(proc_white_list); i++) {
+				// comm has a static size, 16
+				if (strstr(proc_white_list[i], lrw->tsk->comm)) {
+					pr_info("%s(): ignore to kill white list process %s\n", __func__, lrw->tsk->comm);
+					do_kill = 0;
+					break;
+				}
+			}
 		}
 
 		if (do_kill) {
