@@ -33,6 +33,9 @@
 #include "lowmemorykiller_stats.h"
 #include "lowmemorykiller_tasks.h"
 
+extern int lmk_white_list_enabled;
+extern int is_in_lmk_white_list(char *comm);
+
 #define SHRINK_STOP (-1)
 void balance_cache(void)
 {
@@ -68,6 +71,12 @@ void balance_cache(void)
 				     death_pending_len,
 				     cp.dynamic_max_queue_len);
 			goto unlock_out;
+		}
+
+		if (lmk_white_list_enabled) {
+			if (is_in_lmk_white_list(lrw->tsk->comm)) {
+				do_kill = 0;
+			}
 		}
 
 		if (do_kill) {

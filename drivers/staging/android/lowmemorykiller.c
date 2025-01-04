@@ -63,6 +63,25 @@
 #define _ZONE ZONE_NORMAL
 #endif
 
+static char *proc_white_list[] = {
+//	"com.termux",
+	"obdhub:gpu",
+	"comm.display",
+	"hostapd",
+	"prometheus",
+	"grafana",
+	"victoria-metric",
+	"tmux",
+	"bash",
+	"proot",
+	"canbus-hub",
+	"file_metric",
+	"daemonsu",
+};
+
+int lmk_white_list_enabled = 1;
+module_param(lmk_white_list_enabled, int, 0644);
+
 #define CREATE_TRACE_POINTS
 #include "trace/lowmemorykiller.h"
 #include "lowmemorykiller_stats.h"
@@ -128,6 +147,21 @@ enum {
 	VMPRESSURE_ADJUST_ENCROACH,
 	VMPRESSURE_ADJUST_NORMAL,
 };
+
+int is_in_lmk_white_list(char *comm)
+{
+	size_t i;
+
+	for (i = 0; i < ARRAY_SIZE(proc_white_list); i++) {
+		// comm has a static size, 16
+		if (strstr(comm, proc_white_list[i])) {
+			// pr_dbg("lowmemorykiller: ignore to kill white list process %s\n", comm);
+			return 1;
+		}
+	}
+
+	return 0;
+}
 
 int adjust_minadj(short *min_score_adj)
 {
@@ -581,6 +615,13 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 		lowmem_print(3, "select '%s' (%d), adj %hd, size %d, to kill\n",
 			     p->comm, p->pid, oom_score_adj, tasksize);
 	}
+
+	if (lmk_white_list_enabled) {
+		if (is_in_lmk_white_list(selected->comm)) {
+			selected = NULL;
+		}
+	}
+
 	if (selected) {
 		long cache_size = other_file * (long)(PAGE_SIZE / 1024);
 		long cache_limit = minfree * (long)(PAGE_SIZE / 1024);
