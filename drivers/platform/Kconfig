@@ -10,4 +10,4 @@ source "drivers/platform/msm/Kconfig"
 endif
 
 source "drivers/platform/broadcom/v4l2-driver/Kconfig"
-source "drivers/platform/broadcom/wlan/bcm4359/bcmdhd/Kconfig"
+source "drivers/platform/broadcom/wlan/bcm43455/bcmdhd/Kconfig"

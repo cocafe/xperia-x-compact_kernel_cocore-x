@@ -39,17 +39,6 @@ static const char *somc_ta_paths[] = {
 	"/data/etc/wlan_txpower_co1_5g_high",
 };
 
-static const char *somc_ta_paths_override[] = {
-	"/data/etc/wlan_txpower_2_4g_override",
-	"/data/etc/wlan_txpower_5g_low_override",
-	"/data/etc/wlan_txpower_5g_mid_override",
-	"/data/etc/wlan_txpower_5g_high_override",
-	"/data/etc/wlan_txpower_co1_2_4g_override",
-	"/data/etc/wlan_txpower_co1_5g_low_override",
-	"/data/etc/wlan_txpower_co1_5g_mid_override",
-	"/data/etc/wlan_txpower_co1_5g_high_override",
-};
-
 #define SOMC_NV_IS_5G(i) (i % 4 == 0 ? 0 : 1)
 #define SOMC_NV_GET_CHAIN(i) (i < SOMC_TA_TXPWR_CO1_2_4G ? 0 : 1)
 
@@ -73,11 +62,6 @@ static const char *somc_ta_paths_override[] = {
 
 #define SOMC_TXPWR_MAX 127
 #define SOMC_TXPWR_5G 0x20
-
-#define SOMC_TXPWR_MANUAL "/data/etc/wlan_txpower_allrates"
-
-static int dhd_set_txpower = -1;
-static int dhd_txpower_allrates;
 
 typedef struct {
 	char *key;  /* Key for tx power (see the definitions above) */
@@ -167,15 +151,9 @@ somc_read_ta(somc_nv_item_t item, unsigned char *buf, int buf_len)
 	char ta_buf[SOMC_MAX_TABUF_SIZE] = {0};
 	int *d, ret;
 
-	ret = somc_read_file(somc_ta_paths_override[item], ta_buf, sizeof(ta_buf));
-	if (ret != 0) {
-		DHD_ERROR(("%s: custom txpower %s read failure, load system defined\n",
-		           __FUNCTION__, somc_ta_paths_override[item]));
-
-		ret = somc_read_file(somc_ta_paths[item], ta_buf, sizeof(ta_buf));
-		if (ret != 0)
-			return ret;
-	}
+	ret = somc_read_file(somc_ta_paths[item], ta_buf, sizeof(ta_buf));
+	if (ret != 0)
+		return ret;
 
 	switch (item) {
 	case SOMC_TA_TXPWR_2_4G:
@@ -338,8 +316,6 @@ int somc_txpower_calibrate(char *nvram, int nvram_len)
 
 	/* Apply delta (tx power trim) */
 	for (i = 0; i < sizeof(somc_ppr_items) / sizeof(somc_ppr_items[0]); i++) {
-		pr_info("%s: %s delta[%d]: %d\n", __func__, somc_ppr_items[i].key, i, delta[i]);
-
 		if (delta[i] == INT_MAX)
 			continue;
 		if (somc_txpower_apply_delta(somc_ppr_items[i].key, somc_ppr_items[i].len,
@@ -350,60 +326,15 @@ int somc_txpower_calibrate(char *nvram, int nvram_len)
 	return BCME_OK;
 }
 
-int somc_manual_txpower_set(void)
-{
-	char buf[SOMC_MAX_TABUF_SIZE];
-	int val;
-	int ret = 0;
-
-	ret = somc_read_file(SOMC_TXPWR_MANUAL, buf, sizeof(buf));
-	if (ret != 0) {
-		pr_info("%s: custom txpower file not exists\n", __func__);
-		return ret;
-	}
-
-	ret = sscanf(buf, "%d", &val);
-	if (ret != 1) {
-		pr_err("%s: incorrect txpower file\n", __func__);
-		return ret;
-	}
-
-	if (val > 127)
-		val = 127;
-	else if (val < 0)
-		val = 0;
-
-	dhd_txpower_allrates = val;
-	dhd_set_txpower = 1;
-
-	pr_info("%s: set all rates txpower to %u (%udBm)\n", __func__,
-	        dhd_txpower_allrates, (dhd_txpower_allrates + 1) / 4);
-
-	return ret;
-}
-
 int somc_update_qtxpower(char *buf, char band, int chain)
 {
 	int in_qdbm, power;
-	int delta;
+	int delta = somc_txpower_get_min_delta((band & SOMC_TXPWR_5G) != 0, chain);
 
 	in_qdbm = *buf;
 
 	if (in_qdbm < 0 || SOMC_TXPWR_MAX < in_qdbm)
 		return -1;
-
-	if (dhd_set_txpower == -1)
-		somc_manual_txpower_set();
-
-	if (dhd_set_txpower) {
-		delta = 0;
-		power = dhd_txpower_allrates;
-		*buf = (char)power;
-
-		goto out;
-	}
-
-	delta = somc_txpower_get_min_delta((band & SOMC_TXPWR_5G) != 0, chain);
 
 	/* convert unit for calculation since 'delta' uses 1/100dB step */
 	power = in_qdbm + delta / (100 / 4);
@@ -414,10 +345,8 @@ int somc_update_qtxpower(char *buf, char band, int chain)
 	}
 	*buf = (char)power;
 
-out:
-	printk("%s: Set max tx power: %d->%d qdBm (delta=%d) (%s) (chain%d)\n",
-		  __FUNCTION__, in_qdbm, power, delta,
-		  (band & SOMC_TXPWR_5G) ? "5G" : "2_4G", chain);
+	printk("%s: Set max tx power: %d qdBm (delta=%d)\n",
+		  __FUNCTION__, power, delta);
 
 	return 0;
 }

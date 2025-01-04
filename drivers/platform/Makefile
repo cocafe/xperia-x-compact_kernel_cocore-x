@@ -8,4 +8,4 @@ obj-$(CONFIG_GOLDFISH)		+= goldfish/
 obj-$(CONFIG_ARCH_MSM)		+= msm/
 
 obj-y 				+= broadcom/v4l2-driver/
-obj-y				+= broadcom/wlan/bcm4359/bcmdhd/
+obj-y				+= broadcom/wlan/bcm43455/bcmdhd/

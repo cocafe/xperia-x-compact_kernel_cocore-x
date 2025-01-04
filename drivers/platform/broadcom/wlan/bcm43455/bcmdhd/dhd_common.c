@@ -73,8 +73,7 @@
 #ifdef WLMEDIA_HTSF
 extern void htsf_update(struct dhd_info *dhd, void *data);
 #endif
-int dhd_msg_level = DHD_ERROR_VAL;
-
+int dhd_msg_level = DHD_ERROR_VAL | DHD_INFO_VAL | DHD_TRACE_VAL | DHD_LOG_VAL;
 
 #if defined(WL_WIRELESS_EXT)
 #include <wl_iw.h>
