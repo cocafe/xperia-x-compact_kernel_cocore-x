@@ -31,23 +31,24 @@
 
 #if defined(DHD_DEBUG)
 
-#define DHD_ERROR(args)		do {printf args;} while (0)
-#define DHD_TRACE(args)		do {printf args;} while (0)
-#define DHD_INFO(args)		do {printf args;} while (0)
-#define DHD_DATA(args)		do {printf args;} while (0)
-#define DHD_CTL(args)		do {printf args;} while (0)
-#define DHD_TIMER(args)		do {printf args;} while (0)
-#define DHD_HDRS(args)		do {printf args;} while (0)
-#define DHD_BYTES(args)		do {printf args;} while (0)
-#define DHD_INTR(args)		do {printf args;} while (0)
-#define DHD_GLOM(args)		do {printf args;} while (0)
-#define DHD_EVENT(args)		do {printf args;} while (0)
-#define DHD_BTA(args)		do {printf args;} while (0)
-#define DHD_ISCAN(args)		do {printf args;} while (0)
-#define DHD_ARPOE(args)		do {printf args;} while (0)
-#define DHD_REORDER(args)	do {printf args;} while (0)
-#define DHD_PNO(args)		do {printf args;} while (0)
-#define DHD_RTT(args)		do {printf args;} while (0)
+#define DHD_ERROR(args)		do {if ((dhd_msg_level & DHD_ERROR_VAL) && USE_NET_RATELIMIT) \
+								printf args;} while (0)
+#define DHD_TRACE(args)		do {if (dhd_msg_level & DHD_TRACE_VAL) printf args;} while (0)
+#define DHD_INFO(args)		do {if (dhd_msg_level & DHD_INFO_VAL) printf args;} while (0)
+#define DHD_DATA(args)		do {if (dhd_msg_level & DHD_DATA_VAL) printf args;} while (0)
+#define DHD_CTL(args)		do {if (dhd_msg_level & DHD_CTL_VAL) printf args;} while (0)
+#define DHD_TIMER(args)		do {if (dhd_msg_level & DHD_TIMER_VAL) printf args;} while (0)
+#define DHD_HDRS(args)		do {if (dhd_msg_level & DHD_HDRS_VAL) printf args;} while (0)
+#define DHD_BYTES(args)		do {if (dhd_msg_level & DHD_BYTES_VAL) printf args;} while (0)
+#define DHD_INTR(args)		do {if (dhd_msg_level & DHD_INTR_VAL) printf args;} while (0)
+#define DHD_GLOM(args)		do {if (dhd_msg_level & DHD_GLOM_VAL) printf args;} while (0)
+#define DHD_EVENT(args)		do {if (dhd_msg_level & DHD_EVENT_VAL) printf args;} while (0)
+#define DHD_BTA(args)		do {if (dhd_msg_level & DHD_BTA_VAL) printf args;} while (0)
+#define DHD_ISCAN(args)		do {if (dhd_msg_level & DHD_ISCAN_VAL) printf args;} while (0)
+#define DHD_ARPOE(args)		do {if (dhd_msg_level & DHD_ARPOE_VAL) printf args;} while (0)
+#define DHD_REORDER(args)	do {if (dhd_msg_level & DHD_REORDER_VAL) printf args;} while (0)
+#define DHD_PNO(args)		do {if (dhd_msg_level & DHD_PNO_VAL) printf args;} while (0)
+#define DHD_RTT(args)		do {if (dhd_msg_level & DHD_RTT_VAL) printf args;} while (0)
 
 #define DHD_TRACE_HW4	DHD_TRACE
 
@@ -72,7 +73,7 @@
 
 #else /* defined(BCMDBG) || defined(DHD_DEBUG) */
 
-#define DHD_ERROR(args)		do {printf args;} while (0)
+#define DHD_ERROR(args)		do {if (USE_NET_RATELIMIT) printf args;} while (0)
 #define DHD_TRACE(args)
 #define DHD_INFO(args)
 #define DHD_DATA(args)
