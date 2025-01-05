@@ -2010,7 +2010,7 @@
 /* Values for PM */
 #define PM_OFF	0
 #define PM_MAX	1
-#define PM_FAST PM_MAX
+#define PM_FAST 2
 #define PM_FORCE_OFF 3		/* use this bit to force PM off even bt is active */
 
 #define WL_WME_CNT_VERSION	1	/* current version of wl_wme_cnt_t */
