@@ -1441,6 +1441,9 @@ dhdsdio_clkctl(dhd_bus_t *bus, uint target, bool pendok)
 	return ret;
 }
 
+uint dhd_sdio_dont_sleep = 1;
+module_param(dhd_sdio_dont_sleep, uint, 0644);
+
 static int
 dhdsdio_bussleep(dhd_bus_t *bus, bool sleep)
 {
@@ -1448,6 +1451,9 @@ dhdsdio_bussleep(dhd_bus_t *bus, bool sleep)
 	bcmsdh_info_t *sdh = bus->sdh;
 	sdpcmd_regs_t *regs = bus->regs;
 	uint retries = 0;
+
+	if (sleep && dhd_sdio_dont_sleep)
+		return BCME_BUSY;
 
 	DHD_INFO(("dhdsdio_bussleep: request %s (currently %s)\n",
 	          (sleep ? "SLEEP" : "WAKE"),
@@ -1470,7 +1476,6 @@ dhdsdio_bussleep(dhd_bus_t *bus, bool sleep)
 		if (bus->dpc_sched || bus->rxskip || pktq_len(&bus->txq))
 #endif 
 			return BCME_BUSY;
-
 
 		if (!SLPAUTO_ENAB(bus)) {
 			/* Disable SDIO interrupts (no longer interested) */
