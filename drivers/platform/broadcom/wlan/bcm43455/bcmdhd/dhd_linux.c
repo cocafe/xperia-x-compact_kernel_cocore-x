@@ -432,8 +432,8 @@ uint dhd_download_fw_on_driverload = TRUE;
 /* Definitions to provide path to the firmware and nvram
  * example nvram_path[MOD_PARAM_PATHLEN]="/projects/wlan/nvram.txt"
  */
-char firmware_path[MOD_PARAM_PATHLEN];
-char nvram_path[MOD_PARAM_PATHLEN];
+char firmware_path[MOD_PARAM_PATHLEN] = "/system/etc/firmware/wlan/bcmdhd/fw_bcmdhd.bin";
+char nvram_path[MOD_PARAM_PATHLEN] = "/system/etc/firmware/wlan/bcmdhd/bcmdhd.cal";
 
 /* information string to keep firmware, chio, cheip version info visiable from log */
 char info_string[MOD_PARAM_INFOLEN];
@@ -3828,6 +3828,11 @@ fail:
 	return NULL;
 }
 
+uint dhd_softap = 0;
+module_param(dhd_softap, uint, 0644);
+
+static const char *fw_softap = "/system/etc/firmware/wlan/bcmdhd/fw_bcmdhd_apsta.bin";
+
 int dhd_get_fw_mode(dhd_info_t *dhdinfo)
 {
 	if (strstr(dhdinfo->fw_path, "_apsta") != NULL)
@@ -3891,6 +3896,10 @@ bool dhd_update_fw_nv_path(dhd_info_t *dhdinfo)
 	if (nvram_path[0] != '\0')
 		nv = nvram_path;
 
+	if (dhd_softap) {
+		fw = fw_softap;
+	}
+
 	if (fw && fw[0] != '\0') {
 		fw_len = strlen(fw);
 		if (fw_len >= sizeof(dhdinfo->fw_path)) {
@@ -3913,8 +3922,8 @@ bool dhd_update_fw_nv_path(dhd_info_t *dhdinfo)
 	}
 
 	/* clear the path in module parameter */
-	firmware_path[0] = '\0';
-	nvram_path[0] = '\0';
+	// firmware_path[0] = '\0';
+	// nvram_path[0] = '\0';
 
 	if (dhdinfo->fw_path[0] == '\0') {
 		DHD_ERROR(("firmware path not found\n"));
