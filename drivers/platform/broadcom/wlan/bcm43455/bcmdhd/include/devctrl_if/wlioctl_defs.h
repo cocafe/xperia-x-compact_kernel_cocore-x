@@ -2009,7 +2009,8 @@
 
 /* Values for PM */
 #define PM_OFF	0
-#define PM_MAX	1
+// #define PM_MAX	1
+#define PM_MAX	PM_FAST
 #define PM_FAST 2
 #define PM_FORCE_OFF 3		/* use this bit to force PM off even bt is active */
 
