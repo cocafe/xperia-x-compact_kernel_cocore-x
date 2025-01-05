@@ -91,7 +91,7 @@ extern bool  bcmsdh_fatal_error(void *sdh);
 #define FCLOW		(FCHI / 2)
 #define PRIOMASK	7
 
-#define TXRETRIES	2	/* # of retries for tx frames */
+#define TXRETRIES	4	/* # of retries for tx frames */
 #define READ_FRM_CNT_RETRIES	3
 #ifndef DHD_RXBOUND
 #define DHD_RXBOUND	50	/* Default for max rx frames in one scheduling */
@@ -101,7 +101,7 @@ extern bool  bcmsdh_fatal_error(void *sdh);
 #define DHD_TXBOUND	20	/* Default for max tx frames in one scheduling */
 #endif
 
-#define DHD_TXMINMAX	1	/* Max tx frames if rx still pending */
+#define DHD_TXMINMAX	8	/* Max tx frames if rx still pending */
 
 #define MEMBLOCK	2048		/* Block size used for downloading of dongle image */
 #define MAX_NVRAMBUF_SIZE	(6 * 1024) /* max nvram buf size */
