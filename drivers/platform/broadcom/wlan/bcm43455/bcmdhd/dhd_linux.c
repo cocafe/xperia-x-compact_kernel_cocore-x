@@ -578,8 +578,8 @@ module_param(dhd_sdiod_drive_strength, uint, 0);
 /* Tx/Rx bounds */
 extern uint dhd_txbound;
 extern uint dhd_rxbound;
-module_param(dhd_txbound, uint, 0);
-module_param(dhd_rxbound, uint, 0);
+module_param(dhd_txbound, uint, 0644);
+module_param(dhd_rxbound, uint, 0644);
 
 /* Deferred transmits */
 extern uint dhd_deferred_tx;
