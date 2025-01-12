@@ -93,7 +93,7 @@ DHDCFLAGS += -DCONFIG_CONTROL_PM
 DHDCFLAGS += -DCONFIG_HAS_WAKELOCK
 
 # idle count
-DHDCFLAGS += -DDHD_USE_IDLECOUNT
+# DHDCFLAGS += -DDHD_USE_IDLECOUNT
 
 # custom specific value define
 # For special PNO Event keep wake lock for 10sec

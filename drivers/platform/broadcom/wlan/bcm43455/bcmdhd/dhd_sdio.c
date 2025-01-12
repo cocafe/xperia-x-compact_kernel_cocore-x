@@ -422,7 +422,7 @@ uint dhd_txminmax = DHD_TXMINMAX;
 #define DONGLE_MIN_RAMSIZE (128 *1024)
 int dhd_dongle_ramsize;
 
-uint dhd_doflow = TRUE;
+uint dhd_doflow = FALSE;
 uint dhd_dpcpoll = FALSE;
 
 module_param(dhd_doflow, uint, 0644);
