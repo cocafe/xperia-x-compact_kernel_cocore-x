@@ -2316,8 +2316,8 @@ dhd_dpc_thread(void *data)
 		setScheduler(current, SCHED_FIFO, &param);
 	}
 
-#ifdef CUSTOM_DPC_CPUCORE
-	set_cpus_allowed_ptr(current, cpumask_of(CUSTOM_DPC_CPUCORE));
+#ifdef CUSTOM_KTHREAD_CPUMASK
+	set_cpus_allowed_ptr(current, cpumask_of(4));
 #endif
 	/* Run until signal received */
 	while (1) {
@@ -2385,6 +2385,10 @@ dhd_rxf_thread(void *data)
 		param.sched_priority = (dhd_rxf_prio < MAX_RT_PRIO)?dhd_rxf_prio:(MAX_RT_PRIO-1);
 		setScheduler(current, SCHED_FIFO, &param);
 	}
+
+#ifdef CUSTOM_KTHREAD_CPUMASK
+	set_cpus_allowed_ptr(current, cpumask_of(5));
+#endif
 
 	DAEMONIZE("dhd_rxf");
 	/* DHD_OS_WAKE_LOCK is called in dhd_sched_dpc[dhd_linux.c] down below  */
