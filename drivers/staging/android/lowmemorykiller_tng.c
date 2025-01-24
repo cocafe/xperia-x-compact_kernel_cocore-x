@@ -38,12 +38,12 @@
 #include "lowmemorykiller_tng.h"
 
 #include <trace/events/lmk.h>
-#ifdef CONFIG_ZCACHE
-#include <linux/zcache.h>
-#else
+// #ifdef CONFIG_ZCACHE
+// #include <linux/zcache.h>
+// #else
 /*zcache.h has incorrect definition here.*/
 static inline u64 zcache_pages(void) { return 0; }
-#endif
+// #endif
 #define LMK_ZOMBIE_SIZE (4096)
 
 static unsigned long lowmem_count_tng(struct shrinker *s,
