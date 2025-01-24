@@ -8653,12 +8653,12 @@ static int smbchg_check_chg_version(struct smbchg_chip *chip)
 		if (pmic_rev_id->rev4 < 2) /* PMI8950 1.0 */ {
 			chip->wa_flags |= SMBCHG_AICL_DEGLITCH_WA;
 		} else	{ /* rev > PMI8950 v1.0 */
-#ifdef CONFIG_QPNP_SMBCHARGER_EXTENSION
-			chip->wa_flags |= SMBCHG_HVDCP_9V_EN_WA;
-#else
-			chip->wa_flags |= SMBCHG_HVDCP_9V_EN_WA
-					| SMBCHG_USB100_WA;
-#endif
+// #ifdef CONFIG_QPNP_SMBCHARGER_EXTENSION
+// 			chip->wa_flags |= SMBCHG_HVDCP_9V_EN_WA;
+// #else
+// 			chip->wa_flags |= SMBCHG_HVDCP_9V_EN_WA
+// 					| SMBCHG_USB100_WA;
+// #endif
 		}
 		use_pmi8994_tables(chip);
 		chip->tables.aicl_rerun_period_table =
